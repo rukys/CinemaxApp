@@ -1,15 +1,42 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import tw from '../../../tailwind';
 import {
-  IconApple,
+  // IconApple,
   IconAppWithoutText,
   IconFacebook,
   IconGoogle,
 } from '../../assets';
-import { Button, Header, Input } from '../../components';
+import { Button, Header, Input } from '../../components/commons';
+import useAuthFirebase from '../../hooks/use-auth-firebase';
+import { userStore } from '../../stores';
+import useStoreFirebase from '../../hooks/use-store-firebase';
 
 export default function SigninScreen({ navigation }) {
+  const setUser = userStore(state => state.setUser);
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const { loginWithEmail } = useAuthFirebase();
+  const { getUserFromFirestore } = useStoreFirebase();
+
+  const handlePressSignin = () => {
+    loginWithEmail(email, password).then(response => {
+      if (response?._user) {
+        getUserFromFirestore(response?.uid).then(snapshot => {
+          setUser(snapshot);
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'AppBarScreen' }],
+          });
+        });
+      }
+    });
+  };
+
+  const isDisabledButton = email === '' || password === '';
+
   return (
     <>
       <View style={tw.style('flex-1 bg-primaryDark')}>
@@ -43,8 +70,16 @@ export default function SigninScreen({ navigation }) {
             </Text>
           </View>
           <View style={tw.style('mx-6 mt-20')}>
-            <Input label="Email Address" styles={tw.style('mb-6')} />
-            <Input label="Password" isSecureText />
+            <Input
+              label="Email Address"
+              styles={tw.style('mb-6')}
+              onChangeText={val => setEmail(val)}
+            />
+            <Input
+              label="Password"
+              isSecureText
+              onChangeText={val => setPassword(val)}
+            />
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate('ForgotPassScreen');
@@ -57,7 +92,12 @@ export default function SigninScreen({ navigation }) {
               </Text>
             </TouchableOpacity>
           </View>
-          <Button textButton="Login" styles={tw.style('mx-6 mt-10 mb-10')} />
+          <Button
+            textButton="Login"
+            styles={tw.style('mx-6 mt-10 mb-10')}
+            isDisabled={isDisabledButton}
+            onPress={handlePressSignin}
+          />
           <Text
             style={tw.style(
               'text-white font-montserratSemiBold text-textGrey text-xs self-center mb-6',
@@ -67,19 +107,19 @@ export default function SigninScreen({ navigation }) {
           <View style={tw.style('flex-row self-center mb-12')}>
             <TouchableOpacity
               style={tw.style(
-                'h-14 w-14 bg-white rounded-full mr-6 items-center justify-center',
+                'h-14 w-14 bg-white rounded-full mr-3 items-center justify-center',
               )}>
               <IconGoogle height={18} width={18} />
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={tw.style(
                 'h-14 w-14 bg-primarySoft rounded-full items-center justify-center',
               )}>
               <IconApple height={18} width={18} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity
               style={tw.style(
-                'h-14 w-14 bg-blueFB rounded-full ml-6 items-center justify-center',
+                'h-14 w-14 bg-blueFB rounded-full ml-3 items-center justify-center',
               )}>
               <IconFacebook height={18} width={18} />
             </TouchableOpacity>

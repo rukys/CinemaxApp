@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native';
 import React, { useState } from 'react';
 import tw from '../../../tailwind';
-import { Button, Header, Input } from '../../components';
+import { Button, Header, Input } from '../../components/commons';
 
 const ForgotPassScreen = ({ navigation }) => {
   const [isSendEmail, setIsSendEmail] = useState(false);

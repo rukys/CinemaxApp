@@ -13,7 +13,20 @@
           "package_name": "com.cinemaxapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "762335144136-h74d07d9ql88bmdva8dfqnh8dte9a74o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cinemaxapp",
+            "certificate_hash": "93d82c6c49400e137580e5fa0dec1c5b806e1cfa"
+          }
+        },
+        {
+          "client_id": "762335144136-9sal9cqtuh2uhmnajcrovqbte7dtpagh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCam3hq-GGk8GUHFVJIGxFxYM7aRZX3O-Y"
@@ -21,7 +34,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "762335144136-9sal9cqtuh2uhmnajcrovqbte7dtpagh.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "762335144136-2cfmj7s0p22oteuuulv7vjbmorc7ps6g.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.reactjs.native.example.CinemaxApp"
+              }
+            }
+          ]
         }
       }
     }

@@ -1,9 +1,9 @@
-import {View, Text, TouchableOpacity} from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import React from 'react';
-import tw from '../../../tailwind';
-import {IconArrowBack} from '../../assets';
+import tw from '../../../../tailwind';
+import { IconArrowBack } from '../../../assets';
 
-const Header = ({title, onBackPress = () => {}, styles}) => {
+const Header = ({ title, onBackPress = () => {}, styles }) => {
   return (
     <View style={[tw.style('flex-row items-center'), styles]}>
       <TouchableOpacity

@@ -42,6 +42,10 @@ import IconShield from './shield.svg';
 import IconStar from './star.svg';
 import IconTrash from './trash-bin.svg';
 import IconWorkspace from './workspace-premium.svg';
+import IconHomeFill from './home-fill.svg';
+import IconSearchFill from './search-fill.svg';
+import IconHeartFill from './heart-fill.svg';
+import IconPersonFill from './person-fill.svg';
 
 export {
   IconApp,
@@ -88,4 +92,8 @@ export {
   IconStar,
   IconTrash,
   IconWorkspace,
+  IconHomeFill,
+  IconSearchFill,
+  IconHeartFill,
+  IconPersonFill,
 };

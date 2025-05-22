@@ -1,12 +1,12 @@
+import { View, Text } from 'react-native';
 import React from 'react';
-import { Text, View } from 'react-native';
 import tw from '../../../tailwind';
 
-export default function HomeScreen({ navigation }) {
+export default function ProfileScreen() {
   return (
     <>
       <View style={tw.style('flex-1 bg-primaryDark')}>
-        <Text>HomeScreen</Text>
+        <Text>ProfileScreen</Text>
       </View>
     </>
   );

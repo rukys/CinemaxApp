@@ -8,14 +8,14 @@ import {
 import React from 'react';
 import tw from '../../../tailwind';
 import {
-  IconApple,
+  // IconApple,
   IconAppWithoutText,
   IconFacebook,
   IconGoogle,
 } from '../../assets';
-import {Button, Gap} from '../../components';
+import { Button, Gap } from '../../components/commons';
 
-export default function OnboardingScreen({navigation}) {
+export default function OnboardingScreen({ navigation }) {
   return (
     <>
       <StatusBar backgroundColor={tw.color('primaryDark')} />
@@ -69,19 +69,19 @@ export default function OnboardingScreen({navigation}) {
           <View style={tw.style('flex-row')}>
             <TouchableOpacity
               style={tw.style(
-                'h-14 w-14 bg-white rounded-full mr-6 items-center justify-center',
+                'h-14 w-14 bg-white rounded-full mr-3 items-center justify-center',
               )}>
               <IconGoogle height={18} width={18} />
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={tw.style(
                 'h-14 w-14 bg-primarySoft rounded-full items-center justify-center',
               )}>
               <IconApple height={18} width={18} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity
               style={tw.style(
-                'h-14 w-14 bg-blueFB rounded-full ml-6 items-center justify-center',
+                'h-14 w-14 bg-blueFB rounded-full ml-3 items-center justify-center',
               )}>
               <IconFacebook height={18} width={18} />
             </TouchableOpacity>

@@ -75,3 +75,8 @@ package-lock.json
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+# react-native-config codegen
+ios/tmp.xcconfig
+
+# env
+.env

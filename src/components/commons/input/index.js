@@ -1,7 +1,7 @@
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
-import tw from '../../../tailwind';
-import { IconEyeOff } from '../../assets';
+import tw from '../../../../tailwind';
+import { IconEyeOff } from '../../../assets';
 
 const Input = ({
   styles,
@@ -9,10 +9,10 @@ const Input = ({
   textInputStyles,
   label,
   onChangeText = () => {},
-  isSecureText,
+  isSecureText = false,
 }) => {
   const [visibleLabel, setVisibleLabel] = useState(true);
-  const [secureText, setSecureText] = useState(true);
+  const [secureText, setSecureText] = useState(isSecureText);
   const [valInput, setValInput] = useState('');
 
   return (
