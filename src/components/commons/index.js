@@ -3,5 +3,19 @@ import Button from './button';
 import Header from './header';
 import Input from './input';
 import NavigatorItem from './navigator-item';
+import ProfileItem from './profile-item';
+import Carouselitem from './carousel-item';
+import CardPoster from './card-poster';
+import CardList from './card-list';
 
-export { Gap, Button, Header, Input, NavigatorItem };
+export {
+  Gap,
+  Button,
+  Header,
+  Input,
+  NavigatorItem,
+  ProfileItem,
+  Carouselitem,
+  CardPoster,
+  CardList,
+};

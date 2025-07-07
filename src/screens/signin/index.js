@@ -9,11 +9,13 @@ import {
 } from '../../assets';
 import { Button, Header, Input } from '../../components/commons';
 import useAuthFirebase from '../../hooks/use-auth-firebase';
-import { userStore } from '../../stores';
+import { globalStore, userStore } from '../../stores';
 import useStoreFirebase from '../../hooks/use-store-firebase';
 
 export default function SigninScreen({ navigation }) {
   const setUser = userStore(state => state.setUser);
+  const setLoading = globalStore(state => state.setLoading);
+  const loading = globalStore(state => state.loading);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -22,17 +24,24 @@ export default function SigninScreen({ navigation }) {
   const { getUserFromFirestore } = useStoreFirebase();
 
   const handlePressSignin = () => {
-    loginWithEmail(email, password).then(response => {
-      if (response?._user) {
-        getUserFromFirestore(response?.uid).then(snapshot => {
-          setUser(snapshot);
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'AppBarScreen' }],
+    setLoading(true);
+    loginWithEmail(email, password)
+      .then(response => {
+        if (response?._user) {
+          setLoading(false);
+          getUserFromFirestore(response?.uid).then(snapshot => {
+            setUser(snapshot);
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'AppBarScreen' }],
+            });
           });
-        });
-      }
-    });
+        }
+      })
+      .catch(err => {
+        setLoading(false);
+        console.log(err);
+      });
   };
 
   const isDisabledButton = email === '' || password === '';
@@ -94,6 +103,7 @@ export default function SigninScreen({ navigation }) {
           </View>
           <Button
             textButton="Login"
+            isLoading={loading}
             styles={tw.style('mx-6 mt-10 mb-10')}
             isDisabled={isDisabledButton}
             onPress={handlePressSignin}

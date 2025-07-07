@@ -40,12 +40,15 @@ import IconSettings from './settings.svg';
 import IconShare from './share.svg';
 import IconShield from './shield.svg';
 import IconStar from './star.svg';
+import IconStarOrange from './star-orange.svg';
 import IconTrash from './trash-bin.svg';
 import IconWorkspace from './workspace-premium.svg';
 import IconHomeFill from './home-fill.svg';
 import IconSearchFill from './search-fill.svg';
 import IconHeartFill from './heart-fill.svg';
 import IconPersonFill from './person-fill.svg';
+import IconEditProfile from './edit-profile.svg';
+import IconArrowRight from './arrow-right.svg';
 
 export {
   IconApp,
@@ -96,4 +99,7 @@ export {
   IconSearchFill,
   IconHeartFill,
   IconPersonFill,
+  IconEditProfile,
+  IconArrowRight,
+  IconStarOrange,
 };

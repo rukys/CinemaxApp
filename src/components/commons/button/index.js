@@ -1,8 +1,15 @@
-import { Text, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 import React from 'react';
 import tw from '../../../../tailwind';
 
-const Button = ({ textButton, onPress = () => {}, styles, isDisabled }) => {
+const Button = ({
+  textButton = '',
+  onPress = () => {},
+  styles,
+  textStyles,
+  isDisabled,
+  isLoading = false,
+}) => {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -14,9 +21,17 @@ const Button = ({ textButton, onPress = () => {}, styles, isDisabled }) => {
         ),
         styles,
       ]}>
-      <Text style={tw.style('text-textWhite font-montserratMedium text-base')}>
-        {textButton}
-      </Text>
+      {isLoading ? (
+        <ActivityIndicator color={tw.color('white')} />
+      ) : (
+        <Text
+          style={tw.style(
+            'text-textWhite font-montserratMedium text-base',
+            textStyles,
+          )}>
+          {textButton}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 };

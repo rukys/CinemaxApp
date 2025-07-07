@@ -8,6 +8,10 @@ import PrivacyPolicyScreen from './privacy-policy';
 import SearchScreen from './search';
 import FavoriteScreen from './favorite';
 import ProfileScreen from './profile';
+import ProfileEditScreen from './profile-edit';
+import NotificationScreen from './notification';
+import MovieListScreen from './movie-list';
+import MovieDetailScreen from './movie-detail';
 
 export {
   HomeScreen,
@@ -20,4 +24,8 @@ export {
   SearchScreen,
   FavoriteScreen,
   ProfileScreen,
+  ProfileEditScreen,
+  NotificationScreen,
+  MovieListScreen,
+  MovieDetailScreen,
 };

@@ -5,7 +5,11 @@ import {
   FavoriteScreen,
   ForgotPassScreen,
   HomeScreen,
+  MovieDetailScreen,
+  MovieListScreen,
+  NotificationScreen,
   OnboardingScreen,
+  ProfileEditScreen,
   ProfileScreen,
   SearchScreen,
   SigninScreen,
@@ -56,6 +60,10 @@ const Navigations = () => {
       <Stack.Screen name="SignupScreen" component={SignupScreen} />
       <Stack.Screen name="SigninScreen" component={SigninScreen} />
       <Stack.Screen name="AppBarScreen" component={AppBarScreen} />
+      <Stack.Screen name="ProfileEditScreen" component={ProfileEditScreen} />
+      <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
+      <Stack.Screen name="MovieListScreen" component={MovieListScreen} />
+      <Stack.Screen name="MovieDetailScreen" component={MovieDetailScreen} />
     </Stack.Navigator>
   );
 };
