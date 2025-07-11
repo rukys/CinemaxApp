@@ -25,7 +25,7 @@ export const getMovieTrending = () => {
   });
 };
 
-const apiMovieGenre = () => `${API_HOST}genre/movie/list?language=en`;
+const apiMovieGenre = () => `${API_HOST}genre/movie/list?language=en-US`;
 export const getMovieGenre = () => {
   return fetchApi({
     url: apiMovieGenre(),

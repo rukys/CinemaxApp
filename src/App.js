@@ -3,10 +3,10 @@ import {
   useNavigationContainerRef,
 } from '@react-navigation/native';
 import React, { useRef } from 'react';
-import { SafeAreaView, StatusBar, LogBox } from 'react-native';
+import { StatusBar, LogBox } from 'react-native';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import Navigations from './navigations';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import tw from '../tailwind';
 // import {colors} from './utils';
 

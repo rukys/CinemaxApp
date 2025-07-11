@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import tw from '../../../../tailwind';
 import { IconEyeOff } from '../../../assets';
 
@@ -7,13 +8,23 @@ const Input = ({
   styles,
   labelStyles,
   textInputStyles,
-  label,
+  label = '',
+  value = '',
   onChangeText = () => {},
   isSecureText = false,
+  isEditable = true,
 }) => {
   const [visibleLabel, setVisibleLabel] = useState(true);
   const [secureText, setSecureText] = useState(isSecureText);
   const [valInput, setValInput] = useState('');
+
+  useEffect(() => {
+    if (!value) {
+      setVisibleLabel(true);
+    } else {
+      setVisibleLabel(false);
+    }
+  }, []);
 
   return (
     <View
@@ -30,6 +41,8 @@ const Input = ({
         {label}
       </Text>
       <TextInput
+        value={value}
+        editable={isEditable}
         onFocus={() => {
           setVisibleLabel(false);
         }}

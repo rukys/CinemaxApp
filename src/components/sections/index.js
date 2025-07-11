@@ -4,6 +4,8 @@ import CategorySection from './category';
 import ProfileSection from './profile';
 import SearchSection from './search';
 import HomeSection from './home';
+import HomeHeaderSection from './home-header';
+import CastCrewSection from './cast-crew';
 
 export {
   BottomNavigator,
@@ -12,4 +14,6 @@ export {
   ProfileSection,
   SearchSection,
   HomeSection,
+  HomeHeaderSection,
+  CastCrewSection,
 };

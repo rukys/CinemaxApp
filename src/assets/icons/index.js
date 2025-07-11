@@ -18,6 +18,7 @@ import IconDownload1 from './download-1.svg';
 import IconDownloadOffline from './download-offline.svg';
 import IconEdit from './Edit.svg';
 import IconEdit1 from './edit-1.svg';
+import IconEditProfileDetail from './Edit-profile-detail.svg';
 import IconEyeOff from './eye-off.svg';
 import IconFilm from './film.svg';
 import IconFinish from './finish.svg';
@@ -49,6 +50,7 @@ import IconHeartFill from './heart-fill.svg';
 import IconPersonFill from './person-fill.svg';
 import IconEditProfile from './edit-profile.svg';
 import IconArrowRight from './arrow-right.svg';
+import IconHeartRed from './heart-red.svg';
 
 export {
   IconApp,
@@ -102,4 +104,6 @@ export {
   IconEditProfile,
   IconArrowRight,
   IconStarOrange,
+  IconHeartRed,
+  IconEditProfileDetail,
 };

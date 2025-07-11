@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { FlatList, Text, View } from 'react-native';
 import tw from '../../../tailwind';
+import { CardList } from '../../components/commons';
 import { HomeSection, SearchSection } from '../../components/sections';
 import useMovieToprated from '../../hooks/use-movie-toprated';
 import useMovieNowplaying from '../../hooks/use-movie-nowplaying';
-import { CardList } from '../../components/commons';
 import useMovieGenre from '../../hooks/use-movie-genre';
 import useMovieSearch from '../../hooks/use-movie-search';
 import { ImgNoResult } from '../../assets';
@@ -51,28 +51,30 @@ export default function SearchScreen({ navigation }) {
               </Text>
             </View>
           )}
-        {moviesToday.length !== 0 && resultMovieSearch.length === 0 && (
-          <View style={tw.style('mx-4 mb-5')}>
-            <Text
-              style={tw.style(
-                'text-base text-white font-montserratSemiBold mb-4',
-              )}>
-              Today
-            </Text>
-            <CardList
-              image={moviesToday[0]?.poster_path}
-              title={moviesToday[0]?.title}
-              key={moviesToday[0]?.id}
-              relaseDate={moviesToday[0]?.release_date}
-              genreName={getGenreNames(moviesToday[0]?.genre_ids)}
-              onPressCard={() => {
-                navigation.navigate('MovieDetailScreen', {
-                  movieData: moviesToday[0],
-                });
-              }}
-            />
-          </View>
-        )}
+        {valueSearch === '' &&
+          resultMovieSearch.length === 0 &&
+          moviesToday.length !== 0 && (
+            <View style={tw.style('mx-4 mb-5')}>
+              <Text
+                style={tw.style(
+                  'text-base text-white font-montserratSemiBold mb-4',
+                )}>
+                Today
+              </Text>
+              <CardList
+                image={moviesToday[0]?.poster_path}
+                title={moviesToday[0]?.title}
+                key={moviesToday[0]?.id}
+                relaseDate={moviesToday[0]?.release_date}
+                genreName={getGenreNames(moviesToday[0]?.genre_ids)}
+                onPressCard={() => {
+                  navigation.navigate('MovieDetailScreen', {
+                    movieData: moviesToday[0],
+                  });
+                }}
+              />
+            </View>
+          )}
         {resultMovieSearch.length === 0 && valueSearch === '' && (
           <HomeSection
             title="Top Rated"

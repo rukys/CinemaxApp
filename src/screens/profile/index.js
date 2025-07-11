@@ -8,17 +8,19 @@ import {
   IconEditProfile,
   IconFinish,
   IconGlobe,
-  IconNotification,
+  // IconNotification,
   IconPadlock,
   IconPerson,
   IconQuestion,
   IconShield,
   IconTrash,
+  ImgProfile,
   ImgQuestion,
 } from '../../assets';
 import { globalStore, userStore } from '../../stores';
 import { ProfileSection } from '../../components/sections';
 import useAuthFirebase from '../../hooks/use-auth-firebase';
+import FastImage from 'react-native-fast-image';
 
 export default function ProfileScreen({ navigation }) {
   const [visibleModal, setVisibleModal] = useState(false);
@@ -63,7 +65,13 @@ export default function ProfileScreen({ navigation }) {
             style={tw.style(
               'flex-row mx-4 mt-4 border border-2 border-primarySoft rounded-2xl p-4 items-center mb-3',
             )}>
-            <View style={tw.style('h-14 w-14 bg-textGrey rounded-full mr-4')} />
+            <TouchableOpacity
+              onPress={() => navigation.navigate('ProfileEditScreen')}>
+              <FastImage
+                source={ImgProfile}
+                style={tw.style('h-14 w-14 mr-4')}
+              />
+            </TouchableOpacity>
             <View style={tw.style('flex-1')}>
               <Text
                 style={tw.style(
@@ -82,15 +90,26 @@ export default function ProfileScreen({ navigation }) {
           </View>
 
           <ProfileSection title="Account" styles={tw.style('mb-4')}>
-            <ProfileItem title="Member" iconLeft={<IconPerson />} />
+            <ProfileItem
+              title="Edit Profile"
+              iconLeft={<IconPerson />}
+              onPress={() => navigation.navigate('ProfileEditScreen')}
+            />
             <ProfileItem
               title="Change Password"
               iconLeft={<IconPadlock />}
+              onPress={() => navigation.navigate('ChangePasswordScreen')}
               isLastItem
             />
           </ProfileSection>
           <ProfileSection title="General" styles={tw.style('mb-4')}>
-            <ProfileItem title="Notification" iconLeft={<IconNotification />} />
+            {/* <ProfileItem
+              title="Notification"
+              iconLeft={<IconNotification />}
+              onPress={() => {
+                navigation.navigate('NotificationScreen');
+              }}
+            /> */}
             <ProfileItem title="Language" iconLeft={<IconGlobe />} />
             <ProfileItem title="Country" iconLeft={<IconFinish />} />
             <ProfileItem

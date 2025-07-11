@@ -7,6 +7,7 @@ import ProfileItem from './profile-item';
 import Carouselitem from './carousel-item';
 import CardPoster from './card-poster';
 import CardList from './card-list';
+import CastCrewItem from './cast-crew-item';
 
 export {
   Gap,
@@ -18,4 +19,5 @@ export {
   Carouselitem,
   CardPoster,
   CardList,
+  CastCrewItem,
 };

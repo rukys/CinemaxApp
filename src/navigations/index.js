@@ -2,13 +2,19 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import {
+  AboutScreen,
+  ChangePasswordScreen,
+  CountryScreen,
   FavoriteScreen,
   ForgotPassScreen,
+  HelpFaqScreen,
   HomeScreen,
+  LanguageScreen,
   MovieDetailScreen,
   MovieListScreen,
   NotificationScreen,
   OnboardingScreen,
+  PrivacyPolicyScreen,
   ProfileEditScreen,
   ProfileScreen,
   SearchScreen,
@@ -64,6 +70,18 @@ const Navigations = () => {
       <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
       <Stack.Screen name="MovieListScreen" component={MovieListScreen} />
       <Stack.Screen name="MovieDetailScreen" component={MovieDetailScreen} />
+      <Stack.Screen name="LanguageScreen" component={LanguageScreen} />
+      <Stack.Screen name="CountryScreen" component={CountryScreen} />
+      <Stack.Screen
+        name="PrivacyPolicyScreen"
+        component={PrivacyPolicyScreen}
+      />
+      <Stack.Screen name="HelpFaqScreen" component={HelpFaqScreen} />
+      <Stack.Screen name="AboutScreen" component={AboutScreen} />
+      <Stack.Screen
+        name="ChangePasswordScreen"
+        component={ChangePasswordScreen}
+      />
     </Stack.Navigator>
   );
 };

@@ -1,29 +1,40 @@
 import React, { useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { RefreshControl, ScrollView, View } from 'react-native';
 import tw from '../../../tailwind';
-import { IconNotification } from '../../assets';
 import {
   CarouselSection,
   CategorySection,
+  HomeHeaderSection,
   HomeSection,
   SearchSection,
 } from '../../components/sections';
 import useMovieUpcoming from '../../hooks/use-movie-upcoming';
-import { userStore } from '../../stores';
+import { globalStore, userStore } from '../../stores';
 import useMovieGenre from '../../hooks/use-movie-genre';
 import useMoviePopular from '../../hooks/use-movie-popular';
-import { Gap } from '../../components/commons';
 import useMovieNowplaying from '../../hooks/use-movie-nowplaying';
 
 export default function HomeScreen({ navigation }) {
   const [category, setCategory] = useState('All');
 
   const getUser = userStore(state => state.user);
+  const isLoading = globalStore(state => state.loading);
+  const setIsLoading = globalStore(state => state.setLoading);
 
-  const { resultMovieUpcoming } = useMovieUpcoming();
-  const { resultMovieNowplaying } = useMovieNowplaying();
-  const { resultMovieGenre } = useMovieGenre();
-  const { resultMoviePopular } = useMoviePopular();
+  const {
+    resultMovieUpcoming,
+    isLoadingMovieUpcoming,
+    onRefetchMovieUpcoming,
+  } = useMovieUpcoming();
+  const {
+    resultMovieNowplaying,
+    isLoadingMovieNowplaying,
+    onRefetchMovieNowplaying,
+  } = useMovieNowplaying();
+  const { resultMovieGenre, isLoadingMovieGenre, onRefetchMovieGenre } =
+    useMovieGenre();
+  const { resultMoviePopular, isLoadingMoviePopular, onRefetchMoviePopular } =
+    useMoviePopular();
 
   const selectedGenreId =
     category === 'All'
@@ -42,46 +53,43 @@ export default function HomeScreen({ navigation }) {
       )
     : resultMovieUpcoming;
 
+  const isLoadingRefreshScreen =
+    isLoading ||
+    isLoadingMovieUpcoming ||
+    isLoadingMovieNowplaying ||
+    isLoadingMovieGenre ||
+    isLoadingMoviePopular;
+
+  const onRefreshScreen = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      onRefetchMovieUpcoming();
+      onRefetchMovieNowplaying();
+      onRefetchMovieGenre();
+      onRefetchMoviePopular();
+      setIsLoading(false);
+    }, 1500);
+  };
+
   return (
     <View style={tw.style('flex-1 bg-primaryDark')}>
       <ScrollView
+        stickyHeaderIndices={[0]}
         showsVerticalScrollIndicator={false}
-        stickyHeaderIndices={[0]}>
+        refreshControl={
+          <RefreshControl
+            // colors={tw.color('white')}
+            tintColor={tw.color('white')}
+            refreshing={isLoadingRefreshScreen}
+            onRefresh={onRefreshScreen}
+          />
+        }>
         <View style={tw.style('bg-primaryDark mb-6 mt-2')}>
-          <View style={tw.style('flex-row items-center py-2')}>
-            <Gap width={16} />
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('ProfileEditScreen');
-              }}
-              style={tw.style('h-10 w-10 rounded-full bg-textGrey')}
-            />
-            <View style={tw.style('flex-1 ml-4')}>
-              <Text
-                style={tw.style(
-                  'text-base text-white font-montserratSemiBold',
-                )}>
-                Hello, {getUser?.fullName}
-              </Text>
-              <Text style={tw.style('text-textGrey font-montserrat text-xs')}>
-                Let's stream your favorite movie
-              </Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('NotificationScreen');
-              }}
-              style={tw.style(
-                'h-10 w-10 bg-primarySoft items-center justify-center rounded-xl',
-              )}>
-              <IconNotification />
-            </TouchableOpacity>
-            <Gap width={16} />
-          </View>
+          <HomeHeaderSection data={getUser} />
         </View>
         <SearchSection
-          styles={tw.style('mx-4 mb-6')}
           isOnPress
+          styles={tw.style('mx-4 mb-6')}
           onPress={() => {
             navigation.navigate('SearchScreen');
           }}
@@ -96,10 +104,10 @@ export default function HomeScreen({ navigation }) {
         <CategorySection
           styles={tw.style('mb-6')}
           selectedCategory={category}
+          dataCategory={resultMovieGenre}
           onSelectCategory={cat => {
             setCategory(cat);
           }}
-          dataCategory={resultMovieGenre}
         />
         <HomeSection
           title="Most Popular"

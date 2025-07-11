@@ -18,11 +18,23 @@ const CardList = ({
 
   return (
     <TouchableOpacity onPress={onPressCard} style={tw.style('flex-row mb-6')}>
-      <FastImage
-        source={{ uri: urlImage }}
-        resizeMode="cover"
-        style={tw.style('h-44 w-36 rounded-xl')}
-      />
+      {image === null ? (
+        <View
+          style={tw.style(
+            'h-44 w-36 rounded-xl bg-primarySoft items-center justify-center',
+          )}>
+          <Text
+            style={tw.style('text-center text-xs text-white font-montserrat')}>
+            Image not available
+          </Text>
+        </View>
+      ) : (
+        <FastImage
+          source={{ uri: urlImage }}
+          resizeMode="cover"
+          style={tw.style('h-44 w-36 rounded-xl')}
+        />
+      )}
       <View style={tw.style('flex-1 ml-4')}>
         {rated !== 0 && (
           <View
