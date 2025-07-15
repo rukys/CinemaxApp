@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import { View, Text, FlatList } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import tw from '../../../tailwind';
@@ -12,7 +12,6 @@ import { SearchSection } from '../../components/sections';
 
 export default function FavoriteScreen({ navigation }) {
   const [searchText, setSearchText] = useState('');
-  const [filteredList, setFilteredList] = useState([]);
   const [listFavoriteMovie, setListFavoriteMovie] = useState([]);
 
   const getUser = userStore(state => state.user);
@@ -20,14 +19,18 @@ export default function FavoriteScreen({ navigation }) {
   const { getListFavoriteMovie } = useStoreFirebase();
   const { getGenreNames } = useMovieGenre();
 
-  const onChangeSearch = val => {
-    setSearchText(val);
-    const lowercasedSearch = val.toLowerCase();
-    const filtered = listFavoriteMovie.filter(item => {
+  const filteredList = useMemo(() => {
+    if (!searchText) {
+      return listFavoriteMovie;
+    }
+
+    const lowercasedSearch = searchText.toLowerCase();
+    return listFavoriteMovie.filter(item => {
       const titleMatch = item?.title?.toLowerCase().includes(lowercasedSearch);
       const releaseDateMatch = item?.releaseDate
         ?.toLowerCase()
         .includes(lowercasedSearch);
+
       const genreNames = getGenreNames(JSON.parse(item?.genres))
         ?.join(', ')
         ?.toLowerCase();
@@ -35,10 +38,17 @@ export default function FavoriteScreen({ navigation }) {
 
       return titleMatch || releaseDateMatch || genreMatch;
     });
-    setFilteredList(filtered);
-  };
+  }, [searchText, listFavoriteMovie, getGenreNames]);
 
-  const onFetchListFavoriteMovie = () => {
+  const displayData = useMemo(() => {
+    return searchText === '' ? listFavoriteMovie : filteredList;
+  }, [searchText, listFavoriteMovie, filteredList]);
+
+  const onChangeSearch = useCallback(val => {
+    setSearchText(val);
+  }, []);
+
+  const onFetchListFavoriteMovie = useCallback(() => {
     if (!getUser?.id) {
       return;
     }
@@ -52,7 +62,14 @@ export default function FavoriteScreen({ navigation }) {
       .catch(() => {
         setListFavoriteMovie([]);
       });
-  };
+  }, [getUser?.id, getListFavoriteMovie]);
+
+  const handleMovieDetailPress = useCallback(
+    item => {
+      navigation.navigate('MovieDetailScreen', { movieData: item });
+    },
+    [navigation],
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -88,14 +105,13 @@ export default function FavoriteScreen({ navigation }) {
           <View style={tw.style('flex-1')}>
             <SearchSection
               value={searchText}
-              onChangeText={text => {
-                onChangeSearch(text);
-              }}
+              onChangeText={onChangeSearch}
+              onCancel={() => onChangeSearch('')}
               styles={tw.style('mx-4 mb-5 mt-4')}
               placeholder="Search Title, Realese Date, Genre"
             />
             <FlatList
-              data={searchText === '' ? listFavoriteMovie : filteredList}
+              data={displayData}
               style={tw.style('px-4')}
               keyExtractor={item => {
                 return item?.id?.toString();
@@ -108,11 +124,7 @@ export default function FavoriteScreen({ navigation }) {
                   relaseDate={item?.releaseDate}
                   rated={Number(item?.rated)}
                   genreName={getGenreNames(JSON.parse(item?.genres))}
-                  onPressCard={() => {
-                    navigation.navigate('MovieDetailScreen', {
-                      movieData: item,
-                    });
-                  }}
+                  onPressCard={() => handleMovieDetailPress(item)}
                 />
               )}
             />

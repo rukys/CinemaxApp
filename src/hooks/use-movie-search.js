@@ -7,8 +7,8 @@ export default function useMovieSearch(params = '') {
     getMovieSearch,
     {
       enabled: !!params,
-      staleTime: Infinity,
-      cacheTime: Infinity,
+      staleTime: 5 * 60 * 1000, // 5 menit
+      cacheTime: 30 * 60 * 1000, // 30 menit
     },
   );
   const resultMovieSearch = queryMovieSearch?.data?.results || [];
@@ -16,7 +16,7 @@ export default function useMovieSearch(params = '') {
   const isLoadingMovieSearch = queryMovieSearch.isLoading;
 
   const onRefetchMovieSearch = () => {
-    queryMovieSearch.refetch();
+    return queryMovieSearch.refetch();
   };
 
   return {

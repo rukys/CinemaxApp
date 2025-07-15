@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import tw from '../../../tailwind';
 import {
@@ -23,7 +23,23 @@ export default function SigninScreen({ navigation }) {
   const { loginWithEmail } = useAuthFirebase();
   const { getUserFromFirestore } = useStoreFirebase();
 
-  const handlePressSignin = () => {
+  const handleEmailChange = useCallback(value => {
+    setEmail(value);
+  }, []);
+
+  const handlePasswordChange = useCallback(value => {
+    setPassword(value);
+  }, []);
+
+  const handleBackPress = useCallback(() => {
+    navigation.goBack();
+  }, [navigation]);
+
+  const handleForgotPassword = useCallback(() => {
+    navigation.navigate('ForgotPassScreen');
+  }, [navigation]);
+
+  const handlePressSignin = useCallback(() => {
     setLoading(true);
     loginWithEmail(email, password)
       .then(response => {
@@ -38,13 +54,22 @@ export default function SigninScreen({ navigation }) {
           });
         }
       })
-      .catch(err => {
+      .catch(() => {
         setLoading(false);
-        console.log(err);
       });
-  };
+  }, [
+    email,
+    password,
+    loginWithEmail,
+    getUserFromFirestore,
+    setUser,
+    setLoading,
+    navigation,
+  ]);
 
-  const isDisabledButton = email === '' || password === '';
+  const isDisabledButton = useMemo(() => {
+    return email === '' || password === '';
+  }, [email, password]);
 
   return (
     <>
@@ -52,9 +77,7 @@ export default function SigninScreen({ navigation }) {
         <Header
           title="Login"
           styles={tw.style('mx-6')}
-          onBackPress={() => {
-            navigation.goBack();
-          }}
+          onBackPress={handleBackPress}
         />
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={tw.style('items-center mx-6')}>
@@ -81,18 +104,17 @@ export default function SigninScreen({ navigation }) {
           <View style={tw.style('mx-6 mt-20')}>
             <Input
               label="Email Address"
+              value={email}
               styles={tw.style('mb-6')}
-              onChangeText={val => setEmail(val)}
+              onChangeText={handleEmailChange}
             />
             <Input
               label="Password"
+              value={password}
               isSecureText
-              onChangeText={val => setPassword(val)}
+              onChangeText={handlePasswordChange}
             />
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('ForgotPassScreen');
-              }}>
+            <TouchableOpacity onPress={handleForgotPassword}>
               <Text
                 style={tw.style(
                   'font-montserratMedium text-xs text-primaryBlueAccent self-end mt-2',

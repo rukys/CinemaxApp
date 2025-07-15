@@ -9,8 +9,8 @@ export default function useMovieNowplaying() {
     ['get-movie-nowplaying'],
     getMovieNowPlaying,
     {
-      staleTime: Infinity,
-      cacheTime: Infinity,
+      staleTime: 5 * 60 * 1000, // 5 menit
+      cacheTime: 30 * 60 * 1000, // 30 menit
     },
   );
   const resultMovieNowplaying = queryMovieNowplaying?.data?.results || [];
@@ -22,7 +22,7 @@ export default function useMovieNowplaying() {
   const isLoadingMovieNowplaying = queryMovieNowplaying.isLoading;
 
   const onRefetchMovieNowplaying = () => {
-    queryMovieNowplaying.refetch();
+    return queryMovieNowplaying.refetch();
   };
 
   return {

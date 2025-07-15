@@ -7,7 +7,7 @@ const Button = ({
   onPress = () => {},
   styles,
   textStyles,
-  isDisabled,
+  isDisabled = false,
   isLoading = false,
 }) => {
   return (

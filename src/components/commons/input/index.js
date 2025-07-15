@@ -13,6 +13,7 @@ const Input = ({
   onChangeText = () => {},
   isSecureText = false,
   isEditable = true,
+  ...props
 }) => {
   const [visibleLabel, setVisibleLabel] = useState(true);
   const [secureText, setSecureText] = useState(isSecureText);
@@ -62,6 +63,7 @@ const Input = ({
           textInputStyles,
         )}
         secureTextEntry={secureText}
+        {...props}
       />
       {isSecureText && (
         <TouchableOpacity

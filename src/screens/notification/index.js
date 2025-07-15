@@ -14,7 +14,7 @@ export default function NotificationScreen({ navigation }) {
             navigation.goBack();
           }}
         />
-        <Text>NotificationScreen</Text>
+        {/* <Text>NotificationScreen</Text> */}
       </View>
     </>
   );

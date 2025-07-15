@@ -6,8 +6,8 @@ export default function useMovieToprated() {
     ['get-movie-toprated'],
     getMovieTopRated,
     {
-      staleTime: Infinity,
-      cacheTime: Infinity,
+      staleTime: 5 * 60 * 1000, // 5 menit
+      cacheTime: 30 * 60 * 1000, // 30 menit
     },
   );
 
@@ -16,7 +16,7 @@ export default function useMovieToprated() {
   const isLoadingMovieToprated = queryMovieToprated.isLoading;
 
   const onRefetchMovieToprated = () => {
-    queryMovieToprated.refetch();
+    return queryMovieToprated.refetch();
   };
 
   return {

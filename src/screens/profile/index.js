@@ -1,19 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import Modal from 'react-native-modal';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import deviceInfoModule from 'react-native-device-info';
+import auth from '@react-native-firebase/auth';
 import tw from '../../../tailwind';
 import { Button, Header, ProfileItem } from '../../components/commons';
 import {
   IconAlert,
   IconEditProfile,
-  IconFinish,
-  IconGlobe,
+  // IconFinish,
+  // IconGlobe,
   // IconNotification,
   IconPadlock,
   IconPerson,
-  IconQuestion,
+  // IconQuestion,
+  IconRemove,
   IconShield,
-  IconTrash,
+  // IconTrash,
   ImgProfile,
   ImgQuestion,
 } from '../../assets';
@@ -21,28 +24,40 @@ import { globalStore, userStore } from '../../stores';
 import { ProfileSection } from '../../components/sections';
 import useAuthFirebase from '../../hooks/use-auth-firebase';
 import FastImage from 'react-native-fast-image';
+import useStoreFirebase from '../../hooks/use-store-firebase';
 
 export default function ProfileScreen({ navigation }) {
   const [visibleModal, setVisibleModal] = useState(false);
+  const [visibleModalDelete, setVisibleModalDelete] = useState(false);
 
   const getUser = userStore(state => state.user);
   const setUser = userStore(state => state.setUser);
   const setLoading = globalStore(state => state.setLoading);
   const loading = globalStore(state => state.loading);
 
-  const { logout } = useAuthFirebase();
+  const userProfileData = useMemo(
+    () => ({
+      fullName: getUser?.fullName || '',
+      email: getUser?.email || '',
+    }),
+    [getUser?.fullName, getUser?.email],
+  );
 
-  const onClearCacheApp = () => {
+  const { logout } = useAuthFirebase();
+  const { deleteUserFireStore, deleteAllFavoriteMovie } = useStoreFirebase();
+
+  const onClearCacheApp = useCallback(() => {
     setVisibleModal(false);
+    setVisibleModalDelete(false);
     setLoading(false);
     setUser({});
     navigation.reset({
       index: 0,
       routes: [{ name: 'OnboardingScreen' }],
     });
-  };
+  }, [navigation, setLoading, setUser]);
 
-  const handlePressLogout = () => {
+  const handlePressLogout = useCallback(() => {
     setLoading(true);
     logout()
       .then(() => {
@@ -51,7 +66,57 @@ export default function ProfileScreen({ navigation }) {
       .catch(() => {
         onClearCacheApp();
       });
-  };
+  }, [logout, onClearCacheApp, setLoading]);
+
+  const handlePressDeleteAccount = useCallback(async () => {
+    const user = auth().currentUser;
+
+    if (user) {
+      try {
+        await deleteAllFavoriteMovie(user.uid || getUser?.id);
+        await deleteUserFireStore(user.uid || getUser?.id);
+        await user.delete();
+        await handlePressLogout();
+      } catch (error) {
+        if (error.code === 'auth/requires-recent-login') {
+          // console.log(
+          //   'Re-authentication required before deleting the account.',
+          // );
+          // Arahkan user untuk login ulang
+        } else {
+          // console.error('Failed to delete user:', error);
+        }
+      }
+    } else {
+      // console.log('No user is currently signed in.');
+    }
+  }, [
+    deleteAllFavoriteMovie,
+    deleteUserFireStore,
+    getUser?.id,
+    handlePressLogout,
+  ]);
+
+  const appVersion = useMemo(() => {
+    return deviceInfoModule.getVersion();
+  }, []);
+
+  const handleNavigateToEditProfile = useCallback(() => {
+    navigation.navigate('ProfileEditScreen');
+  }, [navigation]);
+
+  const handleNavigateToChangePassword = useCallback(() => {
+    navigation.navigate('ChangePasswordScreen');
+  }, [navigation]);
+
+  const handleNavigateToPrivacyPolicy = useCallback(() => {
+    navigation.navigate('PrivacyPolicyScreen');
+  }, [navigation]);
+
+  const handleNavigateToAbout = useCallback(() => {
+    navigation.navigate('AboutScreen');
+  }, [navigation]);
+
   return (
     <>
       <View style={tw.style('flex-1 bg-primaryDark')}>
@@ -65,8 +130,7 @@ export default function ProfileScreen({ navigation }) {
             style={tw.style(
               'flex-row mx-4 mt-4 border border-2 border-primarySoft rounded-2xl p-4 items-center mb-3',
             )}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('ProfileEditScreen')}>
+            <TouchableOpacity onPress={handleNavigateToEditProfile}>
               <FastImage
                 source={ImgProfile}
                 style={tw.style('h-14 w-14 mr-4')}
@@ -77,14 +141,13 @@ export default function ProfileScreen({ navigation }) {
                 style={tw.style(
                   'font-montserratSemiBold text-white text-base',
                 )}>
-                {getUser?.fullName || ''}
+                {userProfileData.fullName}
               </Text>
               <Text style={tw.style('font-montserrat text-textGrey text-sm')}>
-                {getUser?.email || ''}
+                {userProfileData.email}
               </Text>
             </View>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('ProfileEditScreen')}>
+            <TouchableOpacity onPress={handleNavigateToEditProfile}>
               <IconEditProfile />
             </TouchableOpacity>
           </View>
@@ -93,23 +156,30 @@ export default function ProfileScreen({ navigation }) {
             <ProfileItem
               title="Edit Profile"
               iconLeft={<IconPerson />}
-              onPress={() => navigation.navigate('ProfileEditScreen')}
+              onPress={handleNavigateToEditProfile}
             />
             <ProfileItem
               title="Change Password"
               iconLeft={<IconPadlock />}
-              onPress={() => navigation.navigate('ChangePasswordScreen')}
+              onPress={handleNavigateToChangePassword}
+            />
+            <ProfileItem
+              title="Delete Account"
+              iconLeft={<IconRemove />}
+              onPress={() => {
+                setVisibleModalDelete(true);
+              }}
               isLastItem
             />
           </ProfileSection>
-          <ProfileSection title="General" styles={tw.style('mb-4')}>
-            {/* <ProfileItem
+          {/* <ProfileSection title="General" styles={tw.style('mb-4')}>
+            <ProfileItem
               title="Notification"
               iconLeft={<IconNotification />}
               onPress={() => {
                 navigation.navigate('NotificationScreen');
               }}
-            /> */}
+            />
             <ProfileItem title="Language" iconLeft={<IconGlobe />} />
             <ProfileItem title="Country" iconLeft={<IconFinish />} />
             <ProfileItem
@@ -117,13 +187,28 @@ export default function ProfileScreen({ navigation }) {
               iconLeft={<IconTrash />}
               isLastItem
             />
-          </ProfileSection>
+          </ProfileSection> */}
           <ProfileSection title="More" styles={tw.style('mb-10')}>
-            <ProfileItem title="Legal and Policies" iconLeft={<IconShield />} />
-            <ProfileItem title="Help & Feedback" iconLeft={<IconQuestion />} />
-            <ProfileItem title="About Us" iconLeft={<IconAlert />} isLastItem />
+            <ProfileItem
+              title="Privacy and Policy"
+              iconLeft={<IconShield />}
+              onPress={handleNavigateToPrivacyPolicy}
+            />
+            {/* <ProfileItem title="Help & Feedback" iconLeft={<IconQuestion />} /> */}
+            <ProfileItem
+              isLastItem
+              title="About Us"
+              iconLeft={<IconAlert />}
+              onPress={handleNavigateToAbout}
+            />
           </ProfileSection>
 
+          <Text
+            style={tw.style(
+              'text-white text-sm text-center mb-2 font-montserrat',
+            )}>
+            version {appVersion}
+          </Text>
           <Button
             textButton="Log Out"
             isLoading={loading}
@@ -174,6 +259,48 @@ export default function ProfileScreen({ navigation }) {
               styles={tw.style('flex-1 ml-2')}
               onPress={() => {
                 setVisibleModal(false);
+              }}
+            />
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        isVisible={visibleModalDelete}
+        onBackdropPress={() => {
+          setVisibleModalDelete(false);
+        }}>
+        <View style={tw.style('bg-primarySoft p-5 rounded-3xl')}>
+          <View style={tw.style('self-center mb-2 mt-2')}>
+            <ImgQuestion height={125} width={125} />
+          </View>
+          <Text
+            style={tw.style(
+              'font-montserratSemiBold text-2xl text-white self-center mb-4 mt-5',
+            )}>
+            Delete Account ?
+          </Text>
+          <Text
+            style={tw.style(
+              'text-textGrey text-center mb-10 self-center font-montserrat',
+            )}>
+            This will permanently remove your profile, history, and settings.
+            This action cannot be undone.
+          </Text>
+          <View style={tw.style('flex-row mb-2')}>
+            <Button
+              textButton="Delete"
+              onPress={handlePressDeleteAccount}
+              textStyles={tw.style('text-primaryBlueAccent')}
+              styles={tw.style(
+                'w-1/2 bg-primarySoft border border-primaryBlueAccent',
+              )}
+            />
+            <Button
+              textButton="Cancel"
+              styles={tw.style('flex-1 ml-2')}
+              onPress={() => {
+                setVisibleModalDelete(false);
               }}
             />
           </View>

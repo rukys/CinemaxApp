@@ -12,14 +12,14 @@ export default function useMovieDetail(params = '') {
     getMovieDetail,
     {
       enabled: !!params,
-      staleTime: Infinity,
-      cacheTime: Infinity,
+      staleTime: 5 * 60 * 1000, // 5 menit
+      cacheTime: 30 * 60 * 1000, // 30 menit
     },
   );
   const resultMovieDetail = queryMovieDetail?.data || [];
   const isLoadingMovieDetail = queryMovieDetail.isLoading;
   const onRefetchMovieDetail = () => {
-    queryMovieDetail.refetch();
+    return queryMovieDetail.refetch();
   };
 
   const queryMovieDetailCredits = useQuery(
@@ -27,14 +27,14 @@ export default function useMovieDetail(params = '') {
     getMovieDetailCredits,
     {
       enabled: !!params,
-      staleTime: Infinity,
-      cacheTime: Infinity,
+      staleTime: 5 * 60 * 1000, // 5 menit
+      cacheTime: 30 * 60 * 1000, // 30 menit
     },
   );
   const resultMovieDetailCredits = queryMovieDetailCredits?.data || [];
   const isLoadingMovieDetailCredits = queryMovieDetailCredits.isLoading;
   const onRefetchMovieDetailCredits = () => {
-    queryMovieDetailCredits.refetch();
+    return queryMovieDetailCredits.refetch();
   };
 
   const queryMovieDetailVideos = useQuery(
@@ -42,14 +42,14 @@ export default function useMovieDetail(params = '') {
     getMovieDetailVideos,
     {
       enabled: !!params,
-      staleTime: Infinity,
-      cacheTime: Infinity,
+      staleTime: 5 * 60 * 1000, // 5 menit
+      cacheTime: 30 * 60 * 1000, // 30 menit
     },
   );
   const resultMovieDetailVideos = queryMovieDetailVideos?.data?.results || [];
   const isLoadingMovieDetailVideos = queryMovieDetailVideos.isLoading;
   const onRefetchMovieDetailVideos = () => {
-    queryMovieDetailVideos.refetch();
+    return queryMovieDetailVideos.refetch();
   };
 
   const queryMovieDetailSimilar = useQuery(
@@ -57,14 +57,14 @@ export default function useMovieDetail(params = '') {
     getMovieDetailSimilar,
     {
       enabled: !!params,
-      staleTime: Infinity,
-      cacheTime: Infinity,
+      staleTime: 5 * 60 * 1000, // 5 menit
+      cacheTime: 30 * 60 * 1000, // 30 menit
     },
   );
   const resultMovieDetailSimilar = queryMovieDetailSimilar?.data?.results || [];
   const isLoadingMovieDetailSimilar = queryMovieDetailSimilar.isLoading;
   const onRefetchMovieDetailSimilar = () => {
-    queryMovieDetailSimilar.refetch();
+    return queryMovieDetailSimilar.refetch();
   };
 
   return {

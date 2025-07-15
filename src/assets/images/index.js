@@ -4,6 +4,7 @@ import ImgQuestion from './question.svg';
 import ImgTick from './tick.svg';
 import ImgNoFavorite from './no-favorite.svg';
 import ImgProfile from './person.png';
+import ImgSuccess from './success.svg';
 
 export {
   ImgFolder,
@@ -12,4 +13,5 @@ export {
   ImgTick,
   ImgNoFavorite,
   ImgProfile,
+  ImgSuccess,
 };

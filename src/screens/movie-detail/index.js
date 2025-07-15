@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -29,15 +29,27 @@ import ReactNativeModal from 'react-native-modal';
 import { globalStore, userStore } from '../../stores';
 
 const formatDateWithPrefix = (dateString, prefix = '') => {
-  const date = new Date(dateString);
+  if (!dateString) {
+    return '';
+  }
 
-  const formattedDate = date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return '';
+    }
 
-  return `${prefix} ${formattedDate}`;
+    const formattedDate = date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+
+    return `${prefix} ${formattedDate}`;
+  } catch (error) {
+    // console.error('Date formatting error:', error);
+    return '';
+  }
 };
 
 export default function MovieDetailScreen({ navigation, route }) {
@@ -73,34 +85,30 @@ export default function MovieDetailScreen({ navigation, route }) {
 
   const { getGenreNames, isLoadingMovieGenre, onRefetchMovieGenre } =
     useMovieGenre();
-  const valGenre = movieData?.genre_ids || JSON.parse(movieData?.genres);
-  const genreNames = getGenreNames(valGenre);
+  const valGenre = useMemo(() => {
+    if (movieData?.genre_ids) {
+      return movieData.genre_ids;
+    }
+
+    try {
+      return JSON.parse(movieData?.genres || '[]');
+    } catch (error) {
+      // console.error('Failed to parse genres:', error);
+      return [];
+    }
+  }, [movieData?.genre_ids, movieData?.genres]);
+  const genreNames = useMemo(
+    () => getGenreNames(valGenre),
+    [getGenreNames, valGenre],
+  );
   const genreText = genreNames.join(' | ');
 
-  const rated = Number(resultMovieDetail?.vote_average).toFixed(1) || 0;
+  const rated = Number(resultMovieDetail?.vote_average).toFixed(1) || '0';
 
   const urlImageBackdrop = ImageBackdrop(resultMovieDetail?.poster_path) || '';
 
-  const isLoadingRefreshScreen =
-    isLoading ||
-    isLoadingMovieDetail ||
-    isLoadingMovieGenre ||
-    isLoadingMovieDetailCredits ||
-    isLoadingMovieDetailSimilar;
-
-  const onRefreshScreen = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      onRefetchMovieDetail();
-      onRefetchMovieGenre();
-      onRefetchMovieDetailCredits();
-      onRefetchMovieDetailSimilar();
-      setIsLoading(false);
-    }, 1500);
-  };
-
-  const onSaveFavorite = () => {
-    const genreMovie = resultMovieDetail?.genres.map(item => item.id);
+  const onSaveFavorite = useCallback(async () => {
+    const genreMovie = resultMovieDetail?.genres?.map(item => item.id) || [];
     const storeFavMovie = {
       id: String(resultMovieDetail?.id),
       title: resultMovieDetail?.title,
@@ -110,27 +118,110 @@ export default function MovieDetailScreen({ navigation, route }) {
       genres: JSON.stringify(genreMovie),
     };
 
-    saveFavoriteMovie(storeFavMovie, getUser?.id);
-    setIsFavorite(true);
-  };
+    try {
+      await saveFavoriteMovie(storeFavMovie, getUser?.id);
+      setIsFavorite(true);
+    } catch (error) {
+      // console.error('Failed to save favorite:', error);
+    }
+  }, [resultMovieDetail, getUser?.id, saveFavoriteMovie]);
 
-  const onDeleteFavorite = () => {
-    deleteFavoriteMovie(String(resultMovieDetail?.id), getUser?.id);
-    setIsFavorite(false);
-  };
+  const onDeleteFavorite = useCallback(async () => {
+    try {
+      await deleteFavoriteMovie(String(resultMovieDetail?.id), getUser?.id);
+      setIsFavorite(false);
+    } catch (error) {
+      // console.error('Failed to delete favorite:', error);
+    }
+  }, [resultMovieDetail?.id, getUser?.id, deleteFavoriteMovie]);
 
-  const onUpdateFavorite = () => {
-    const movieId = resultMovieDetail?.id;
-    const userId = getUser?.id;
+  const onUpdateFavorite = useCallback(async () => {
+    if (!resultMovieDetail?.id || !getUser?.id) {
+      return;
+    }
 
-    getFavoriteMovie(String(movieId), userId)
-      .then(res => {
-        setIsFavorite(!!res);
-      })
-      .catch(() => {
-        setIsFavorite(false);
-      });
-  };
+    try {
+      const res = await getFavoriteMovie(
+        String(resultMovieDetail.id),
+        getUser.id,
+      );
+      setIsFavorite(!!res);
+    } catch (error) {
+      // console.error('Failed to check favorite status:', error);
+      setIsFavorite(false);
+    }
+  }, [resultMovieDetail?.id, getUser?.id, getFavoriteMovie]);
+
+  const onPressCastCrew = useCallback(item => {
+    setValCastCrew(item);
+    setVisibleModal(true);
+  }, []);
+
+  const handleModalClose = useCallback(() => {
+    setVisibleModal(false);
+  }, []);
+
+  const onBackPress = useCallback(() => {
+    navigation.goBack();
+  }, [navigation]);
+
+  const onNavigateToMovieList = useCallback(() => {
+    navigation.navigate('MovieListScreen', {
+      movieList: resultMovieDetailSimilar,
+      title: 'Similar Movie',
+    });
+  }, [navigation, resultMovieDetailSimilar]);
+
+  const onNavigateToMovieDetail = useCallback(
+    item => {
+      navigation.navigate('MovieDetailScreen', { movieData: item });
+    },
+    [navigation],
+  );
+
+  const onScroll = useCallback(event => {
+    const offsetY = event.nativeEvent.contentOffset.y;
+    setIsAtTop(offsetY <= 0);
+  }, []);
+
+  const isLoadingRefreshScreen = useMemo(() => {
+    return (
+      isLoading ||
+      isLoadingMovieDetail ||
+      isLoadingMovieGenre ||
+      isLoadingMovieDetailCredits ||
+      isLoadingMovieDetailSimilar
+    );
+  }, [
+    isLoading,
+    isLoadingMovieDetail,
+    isLoadingMovieGenre,
+    isLoadingMovieDetailCredits,
+    isLoadingMovieDetailSimilar,
+  ]);
+
+  const onRefreshScreen = useCallback(async () => {
+    setIsLoading(true);
+
+    const minDelay = new Promise(resolve => setTimeout(resolve, 1000));
+
+    try {
+      await Promise.all([
+        minDelay,
+        onRefetchMovieDetail(),
+        onRefetchMovieGenre(),
+        onRefetchMovieDetailCredits(),
+        onRefetchMovieDetailSimilar(),
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [
+    onRefetchMovieDetail,
+    onRefetchMovieGenre,
+    onRefetchMovieDetailCredits,
+    onRefetchMovieDetailSimilar,
+  ]);
 
   useFocusEffect(
     useCallback(() => {
@@ -153,10 +244,7 @@ export default function MovieDetailScreen({ navigation, route }) {
         <ScrollView
           stickyHeaderIndices={[0]}
           scrollEventThrottle={16}
-          onScroll={event => {
-            const offsetY = event.nativeEvent.contentOffset.y;
-            setIsAtTop(offsetY <= 0);
-          }}
+          onScroll={onScroll}
           refreshControl={
             <RefreshControl
               // colors={tw.color('white')}
@@ -168,9 +256,7 @@ export default function MovieDetailScreen({ navigation, route }) {
           <Header
             styles={tw.style('px-4 mb-5 py-2', !isAtTop && 'bg-primaryDark')}
             title={resultMovieDetail?.title || ''}
-            onBackPress={() => {
-              navigation.goBack();
-            }}
+            onBackPress={onBackPress}
           />
           <View style={tw.style('items-center mb-8')}>
             <FastImage
@@ -240,8 +326,7 @@ export default function MovieDetailScreen({ navigation, route }) {
             data={valCastArray}
             styles={tw.style('bg-primaryDark pb-2 pt-2')}
             onPressCastCrew={item => {
-              setValCastCrew(item);
-              setVisibleModal(true);
+              onPressCastCrew(item);
             }}
           />
 
@@ -250,8 +335,7 @@ export default function MovieDetailScreen({ navigation, route }) {
             data={valCrewArray}
             styles={tw.style('bg-primaryDark pt-2')}
             onPressCastCrew={item => {
-              setValCastCrew(item);
-              setVisibleModal(true);
+              onPressCastCrew(item);
             }}
           />
 
@@ -262,14 +346,9 @@ export default function MovieDetailScreen({ navigation, route }) {
             // isSeeAll={false}
             styles={tw.style('mb-6 bg-primaryDark')}
             dataHomeSection={resultMovieDetailSimilar}
-            onPressSeeAll={() => {
-              navigation.navigate('MovieListScreen', {
-                movieList: resultMovieDetailSimilar,
-                title: 'Similar Movie',
-              });
-            }}
+            onPressSeeAll={onNavigateToMovieList}
             onPressHomeSection={item => {
-              navigation.navigate('MovieDetailScreen', { movieData: item });
+              onNavigateToMovieDetail(item);
             }}
           />
         </ScrollView>
@@ -277,9 +356,7 @@ export default function MovieDetailScreen({ navigation, route }) {
 
       <ReactNativeModal
         isVisible={visibleModal}
-        onBackdropPress={() => {
-          setVisibleModal(false);
-        }}>
+        onBackdropPress={handleModalClose}>
         <View style={tw.style('bg-primarySoft rounded-lg')}>
           <FastImage
             source={{ uri: ImageBackdrop(valCastCrew?.profile_path) }}
@@ -319,9 +396,7 @@ export default function MovieDetailScreen({ navigation, route }) {
               styles={tw.style(
                 'border border-primaryBlueAccent bg-primarySoft mt-2',
               )}
-              onPress={() => {
-                setVisibleModal(false);
-              }}
+              onPress={handleModalClose}
             />
           </View>
         </View>

@@ -16,7 +16,7 @@ export default function ChangePasswordScreen({ navigation }) {
         />
         <ScrollView style={tw.style('flex-1')}>
           <View style={tw.style('mt-6')}>
-            <Input label="Old Password" styles={tw.style('mx-6 mb-6')} />
+            {/* <Input label="Old Password" styles={tw.style('mx-6 mb-6')} /> */}
             <Input label="New Password" styles={tw.style('mx-6 mb-6')} />
             <Input label="Re-New Password" styles={tw.style('mx-6 mb-6')} />
           </View>

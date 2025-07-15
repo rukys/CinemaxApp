@@ -6,8 +6,8 @@ export default function useMovieUpcoming() {
     ['get-movie-upcoming'],
     getMovieUpcoming,
     {
-      staleTime: Infinity,
-      cacheTime: Infinity,
+      staleTime: 5 * 60 * 1000, // 5 menit
+      cacheTime: 30 * 60 * 1000, // 30 menit
     },
   );
   const resultMovieUpcoming = queryMovieUpcoming?.data?.results || [];
@@ -15,7 +15,7 @@ export default function useMovieUpcoming() {
   const isLoadingMovieUpcoming = queryMovieUpcoming.isLoading;
 
   const onRefetchMovieUpcoming = () => {
-    queryMovieUpcoming.refetch();
+    return queryMovieUpcoming.refetch();
   };
 
   return {

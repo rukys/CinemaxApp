@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
+    "aabRelease": "cd android && ./gradlew bundleRelease",
+    "apkRelease": "cd android && ./gradlew assembleRelease",
     "androidClean": "cd android && ./gradlew clean && cd ../",
     "ios": "react-native run-ios",
     "setup": "rm -rf node_modules && rm yarn.lock && yarn install",
@@ -27,6 +29,7 @@
     "react": "19.0.0",
     "react-native": "0.79.0",
     "react-native-config": "^1.5.5",
+    "react-native-device-info": "^14.0.4",
     "react-native-fast-image": "^8.6.3",
     "react-native-fbsdk-next": "^13.4.1",
     "react-native-gesture-handler": "^2.25.0",

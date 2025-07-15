@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState, useMemo, useCallback } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 import tw from '../../../tailwind';
 import {
@@ -36,51 +37,85 @@ export default function HomeScreen({ navigation }) {
   const { resultMoviePopular, isLoadingMoviePopular, onRefetchMoviePopular } =
     useMoviePopular();
 
-  const selectedGenreId =
-    category === 'All'
+  const selectedGenreId = useMemo(() => {
+    return category === 'All'
       ? null
       : resultMovieGenre.find(g => g.name === category)?.id;
+  }, [category, resultMovieGenre]);
 
-  const filteredPopular = selectedGenreId
-    ? resultMoviePopular.filter(movie =>
-        movie.genre_ids.includes(selectedGenreId),
-      )
-    : resultMoviePopular;
+  const filteredPopular = useMemo(() => {
+    return selectedGenreId
+      ? resultMoviePopular.filter(movie =>
+          movie.genre_ids.includes(selectedGenreId),
+        )
+      : resultMoviePopular;
+  }, [selectedGenreId, resultMoviePopular]);
 
-  const filteredUpcoming = selectedGenreId
-    ? resultMovieUpcoming.filter(movie =>
-        movie.genre_ids.includes(selectedGenreId),
-      )
-    : resultMovieUpcoming;
+  const filteredUpcoming = useMemo(() => {
+    return selectedGenreId
+      ? resultMovieUpcoming.filter(movie =>
+          movie.genre_ids.includes(selectedGenreId),
+        )
+      : resultMovieUpcoming;
+  }, [selectedGenreId, resultMovieUpcoming]);
 
-  const isLoadingRefreshScreen =
-    isLoading ||
-    isLoadingMovieUpcoming ||
-    isLoadingMovieNowplaying ||
-    isLoadingMovieGenre ||
-    isLoadingMoviePopular;
+  const isAnyLoading = useMemo(() => {
+    return (
+      isLoading ||
+      isLoadingMovieUpcoming ||
+      isLoadingMovieNowplaying ||
+      isLoadingMovieGenre ||
+      isLoadingMoviePopular
+    );
+  }, [
+    isLoading,
+    isLoadingMovieUpcoming,
+    isLoadingMovieNowplaying,
+    isLoadingMovieGenre,
+    isLoadingMoviePopular,
+  ]);
 
-  const onRefreshScreen = () => {
+  const handleMoviePress = useCallback(
+    item => {
+      navigation.navigate('MovieDetailScreen', { movieData: item });
+    },
+    [navigation],
+  );
+
+  const onRefreshScreen = useCallback(async () => {
     setIsLoading(true);
-    setTimeout(() => {
-      onRefetchMovieUpcoming();
-      onRefetchMovieNowplaying();
-      onRefetchMovieGenre();
-      onRefetchMoviePopular();
+
+    const minDelay = new Promise(resolve => setTimeout(resolve, 1000));
+
+    try {
+      await Promise.all([
+        minDelay,
+        onRefetchMovieUpcoming(),
+        onRefetchMovieNowplaying(),
+        onRefetchMovieGenre(),
+        onRefetchMoviePopular(),
+      ]);
+    } finally {
       setIsLoading(false);
-    }, 1500);
-  };
+    }
+  }, [
+    onRefetchMovieUpcoming,
+    onRefetchMovieNowplaying,
+    onRefetchMovieGenre,
+    onRefetchMoviePopular,
+  ]);
 
   return (
     <View style={tw.style('flex-1 bg-primaryDark')}>
       <ScrollView
         stickyHeaderIndices={[0]}
+        scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             // colors={tw.color('white')}
             tintColor={tw.color('white')}
-            refreshing={isLoadingRefreshScreen}
+            refreshing={isAnyLoading}
             onRefresh={onRefreshScreen}
           />
         }>
@@ -98,7 +133,7 @@ export default function HomeScreen({ navigation }) {
           styles={tw.style('mb-6')}
           dataCarousel={resultMovieNowplaying.slice(0, 5)}
           onPressCarousel={item => {
-            navigation.navigate('MovieDetailScreen', { movieData: item });
+            handleMoviePress(item);
           }}
         />
         <CategorySection
@@ -120,7 +155,7 @@ export default function HomeScreen({ navigation }) {
             });
           }}
           onPressHomeSection={item => {
-            navigation.navigate('MovieDetailScreen', { movieData: item });
+            handleMoviePress(item);
           }}
         />
         <HomeSection
@@ -134,7 +169,7 @@ export default function HomeScreen({ navigation }) {
             });
           }}
           onPressHomeSection={item => {
-            navigation.navigate('MovieDetailScreen', { movieData: item });
+            handleMoviePress(item);
           }}
         />
       </ScrollView>

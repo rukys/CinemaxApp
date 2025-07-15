@@ -6,8 +6,8 @@ export default function useMovieTrending() {
     ['get-movie-trending'],
     getMovieTrending,
     {
-      staleTime: Infinity,
-      cacheTime: Infinity,
+      staleTime: 5 * 60 * 1000, // 5 menit
+      cacheTime: 30 * 60 * 1000, // 30 menit
     },
   );
   const resultMovieTrending = queryMovieTrending?.data?.results || [];
@@ -15,7 +15,7 @@ export default function useMovieTrending() {
   const isLoadingMovieTrending = queryMovieTrending.isLoading;
 
   const onRefetchMovieTrending = () => {
-    queryMovieTrending.refetch();
+    return queryMovieTrending.refetch();
   };
 
   return {

@@ -1,5 +1,5 @@
 import { View, FlatList } from 'react-native';
-import React from 'react';
+import React, { useCallback } from 'react';
 import tw from '../../../tailwind';
 import { CardList, Header } from '../../components/commons';
 import { SearchSection } from '../../components/sections';
@@ -10,14 +10,23 @@ export default function MovieListScreen({ navigation, route }) {
 
   const { getGenreNames } = useMovieGenre();
 
+  const handleMovieDetailPress = useCallback(
+    item => {
+      navigation.navigate('MovieDetailScreen', { movieData: item });
+    },
+    [navigation],
+  );
+
+  const handleBackPress = useCallback(() => {
+    navigation.goBack();
+  }, [navigation]);
+
   return (
     <View style={tw.style('flex-1 bg-primaryDark')}>
       <Header
         styles={tw.style('mx-4 mb-5')}
         title={title}
-        onBackPress={() => {
-          navigation.goBack();
-        }}
+        onBackPress={handleBackPress}
       />
       <SearchSection
         styles={tw.style('mx-4 mb-5')}
@@ -37,9 +46,7 @@ export default function MovieListScreen({ navigation, route }) {
             relaseDate={item?.release_date}
             rated={item?.vote_average}
             genreName={getGenreNames(item?.genre_ids)}
-            onPressCard={() => {
-              navigation.navigate('MovieDetailScreen', { movieData: item });
-            }}
+            onPressCard={() => handleMovieDetailPress(item)}
           />
         )}
       />

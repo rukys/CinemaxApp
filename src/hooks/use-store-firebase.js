@@ -24,6 +24,30 @@ export default function useStoreFirebase() {
     }
   };
 
+  const updateUserToFirestore = async userData => {
+    try {
+      const userRef = firestore().collection('users').doc(userData.id);
+      await userRef.update(userData);
+    } catch (error) {
+      throw new Error('Failed to update user data: ' + error.message);
+    }
+  };
+
+  const deleteUserFireStore = async uid => {
+    try {
+      const docRef = firestore().collection('users').doc(uid);
+      const snapshot = await docRef.get();
+      if (!snapshot.exists) {
+        throw new Error('User not found');
+      }
+
+      await docRef.delete();
+      return snapshot.data();
+    } catch (error) {
+      throw new Error('Failed to delete user data: ' + error.message);
+    }
+  };
+
   const listenToUserData = (uid, callback) => {
     return firestore()
       .collection('users')
@@ -116,16 +140,38 @@ export default function useStoreFirebase() {
       throw new Error('Failed to delete favorite movie data: ' + error.message);
     }
   };
+
+  const deleteAllFavoriteMovie = async uid => {
+    try {
+      const docRef = firestore().collection('users').doc(uid);
+      // Hapus subcollection favorite
+      const favoriteSnapshot = await docRef.collection('favorite').get();
+      const batch = firestore().batch();
+
+      favoriteSnapshot.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+    } catch (error) {
+      throw new Error(
+        'Failed to delete all favorite movie data: ' + error.message,
+      );
+    }
+  };
   // -- -- //
 
   return {
     saveUserToFirestore,
     getUserFromFirestore,
+    updateUserToFirestore,
+    deleteUserFireStore,
     listenToUserData,
 
     saveFavoriteMovie,
     getFavoriteMovie,
     getListFavoriteMovie,
     deleteFavoriteMovie,
+    deleteAllFavoriteMovie,
   };
 }

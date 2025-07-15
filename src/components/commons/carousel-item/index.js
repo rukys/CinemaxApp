@@ -1,5 +1,6 @@
 import React from 'react';
-import { Text, View, TouchableOpacity } from 'react-native';
+import { Text, TouchableOpacity } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
 import tw from '../../../../tailwind';
 import { ImageBackdrop } from '../../../constants';
@@ -30,14 +31,17 @@ const Carouselitem = ({
         source={{ uri: urlImg }}
         style={tw.style('h-full w-full rounded-2xl')}
       />
-      <View style={tw.style('absolute bottom-0 mb-4 ml-4')}>
-        <Text style={tw.style('text-lg text-white font-montserratSemiBold')}>
+      <LinearGradient
+        colors={['rgba(0,0,0,0)', 'rgba(0,0,0,1)']}
+        style={tw.style('absolute bottom-0 w-full rounded-b-2xl')}>
+        <Text
+          style={tw.style('text-lg text-white font-montserratSemiBold ml-4')}>
           {title}
         </Text>
-        <Text style={tw.style('text-white text-xs font-montserrat')}>
+        <Text style={tw.style('text-white text-xs font-montserrat mb-4 ml-4')}>
           {formatDateWithPrefix(releaseDate)}
         </Text>
-      </View>
+      </LinearGradient>
     </TouchableOpacity>
   );
 };
