@@ -29,7 +29,7 @@ export default function PrivacyPolicyScreen({ navigation }) {
 
             <View style={tw.style('mb-4')}>
               <Text style={tw.style('text-white text-base font-montserrat ')}>
-                Cinemax App ("we", "our", or "the app") is committed to
+                Cinemagz App ("we", "our", or "the app") is committed to
                 protecting your privacy. This Privacy Policy describes how we
                 collect, use, and safeguard your personal information when you
                 use our mobile application on Android and iOS platforms.
@@ -131,7 +131,7 @@ export default function PrivacyPolicyScreen({ navigation }) {
                 6. Children’s Privacy
               </Text>
               <Text style={tw.style('text-white text-base font-montserrat')}>
-                Cinemax App is also intended for use by children. We do not
+                Cinemagz App is also intended for use by children. We do not
                 knowingly collect personal information from children under the
                 age of 13 without parental consent. If we become aware that we
                 have collected personal data from a child without proper

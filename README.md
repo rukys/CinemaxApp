@@ -1,8 +1,8 @@
-# Cinemax App
+# Cinemagz App
 
-Cinemax App is a movie search and discovery app that makes it easy for you to find detailed information about movies, crew members, and your favorite actors. All movie data and posters are provided by The Movie Database (TMDB).
+Cinemagz App is a movie search and discovery app that makes it easy for you to find detailed information about movies, crew members, and your favorite actors. All movie data and posters are provided by The Movie Database (TMDB).
 
-![App Screenshot](docs/images/CinemaxApp.png)
+![App Screenshot](docs/images/Cinemagz.png)
 
 ## Tech Stack
 

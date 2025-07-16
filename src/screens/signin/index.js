@@ -4,8 +4,8 @@ import tw from '../../../tailwind';
 import {
   // IconApple,
   IconAppWithoutText,
-  IconFacebook,
-  IconGoogle,
+  // IconFacebook,
+  // IconGoogle,
 } from '../../assets';
 import { Button, Header, Input } from '../../components/commons';
 import useAuthFirebase from '../../hooks/use-auth-firebase';
@@ -86,7 +86,7 @@ export default function SigninScreen({ navigation }) {
               style={tw.style(
                 'text-textWhite font-montserratSemiBold text-2xl mb-2',
               )}>
-              CINEMAX
+              Cinemagz
             </Text>
             <Text
               style={tw.style(
@@ -130,32 +130,32 @@ export default function SigninScreen({ navigation }) {
             isDisabled={isDisabledButton}
             onPress={handlePressSignin}
           />
-          <Text
+          {/* <Text
             style={tw.style(
               'text-white font-montserratSemiBold text-textGrey text-xs self-center mb-6',
             )}>
             Or Login with
-          </Text>
-          <View style={tw.style('flex-row self-center mb-12')}>
+          </Text> */}
+          {/* <View style={tw.style('flex-row self-center mb-12')}>
             <TouchableOpacity
               style={tw.style(
                 'h-14 w-14 bg-white rounded-full mr-3 items-center justify-center',
               )}>
               <IconGoogle height={18} width={18} />
             </TouchableOpacity>
-            {/* <TouchableOpacity
+            <TouchableOpacity
               style={tw.style(
                 'h-14 w-14 bg-primarySoft rounded-full items-center justify-center',
               )}>
               <IconApple height={18} width={18} />
-            </TouchableOpacity> */}
+            </TouchableOpacity>
             <TouchableOpacity
               style={tw.style(
                 'h-14 w-14 bg-blueFB rounded-full ml-3 items-center justify-center',
               )}>
               <IconFacebook height={18} width={18} />
             </TouchableOpacity>
-          </View>
+          </View> */}
         </ScrollView>
       </View>
     </>

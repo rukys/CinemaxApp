@@ -30,13 +30,13 @@ const Input = ({
   return (
     <View
       style={tw.style(
-        'flex-row h-14 border rounded-full border-primarySoft px-4 py-4',
+        'flex-row h-14 border rounded-full border-primarySoft p-4 items-center',
         styles,
       )}>
       <Text
         style={tw.style(
-          'text-textWhiteGrey font-montserratMedium text-xs absolute ml-4 -mt-2 bg-primaryDark px-1',
-          visibleLabel && 'bottom-4.5',
+          'text-textWhiteGrey font-montserratMedium text-xs absolute ml-4 bg-primaryDark px-1',
+          !visibleLabel && 'absolute mb-7.5 ml-6 bottom-4.5',
           labelStyles,
         )}>
         {label}
@@ -59,7 +59,7 @@ const Input = ({
           onChangeText(val);
         }}
         style={tw.style(
-          'flex-1 text-textWhiteGrey font-montserratMedium text-sm',
+          'flex-1 h-14 text-textWhiteGrey font-montserratMedium text-sm',
           textInputStyles,
         )}
         secureTextEntry={secureText}

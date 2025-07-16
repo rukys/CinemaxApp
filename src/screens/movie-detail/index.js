@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback, useState, useMemo } from 'react';
 import {
@@ -7,6 +8,7 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
+  Dimensions,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -27,6 +29,8 @@ import useStoreFirebase from '../../hooks/use-store-firebase';
 import { CastCrewSection, HomeSection } from '../../components/sections';
 import ReactNativeModal from 'react-native-modal';
 import { globalStore, userStore } from '../../stores';
+
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 const formatDateWithPrefix = (dateString, prefix = '') => {
   if (!dateString) {
@@ -235,12 +239,38 @@ export default function MovieDetailScreen({ navigation, route }) {
         <ImageBackground
           source={{ uri: urlImageBackdrop }}
           resizeMode="cover"
-          style={tw.style('absolute h-128 w-full opacity-20 z-0')}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            width: screenWidth,
+            height: screenHeight * 0.68,
+            opacity: 0.2,
+            zIndex: 0,
+          }}
         />
         <LinearGradient
           colors={['transparent', tw.color('primaryDark')]}
-          style={tw.style('absolute bottom-65 h-48 w-full z-0')}
+          style={{
+            position: 'absolute',
+            top: screenHeight * 0.68 - screenHeight * 0.3,
+            left: 0,
+            right: 0,
+            width: screenWidth,
+            height: screenHeight * 0.3,
+            zIndex: 0,
+          }}
         />
+        {/* <ImageBackground
+          source={{ uri: urlImageBackdrop }}
+          resizeMode="cover"
+          style={tw.style('absolute h-78% w-full opacity-20 z-0')}
+        />
+        <LinearGradient
+          colors={['transparent', tw.color('primaryDark')]}
+          style={tw.style('absolute top-0 mt-82 h-48 w-full z-0')}
+        /> */}
         <ScrollView
           stickyHeaderIndices={[0]}
           scrollEventThrottle={16}

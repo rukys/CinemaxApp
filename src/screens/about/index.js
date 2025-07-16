@@ -21,18 +21,18 @@ export default function AboutScreen({ navigation }) {
               <IconApp />
             </View>
             <Text style={tw.style('text-white text-base font-montserrat mb-2')}>
-              CinemaxApp is a movie search and exploration app that makes it
+              Cinemagz App is a movie search and exploration app that makes it
               easy for you to find detailed information about your favorite
               movies, TV series, and actors. All movie data and posters are
               provided by The Movie Database (TMDB).
             </Text>
             <Text style={tw.style('text-white text-base font-montserrat mb-2')}>
-              CinemaxApp does not provide movie streaming services. This app
+              Cinemagz App does not provide movie streaming services. This app
               only displays official information from TMDB.
             </Text>
             <Text style={tw.style('text-white text-base font-montserrat mb-2')}>
               This app uses the public API from The Movie Database (TMDB).
-              CinemaxApp is not officially affiliated with TMDB.
+              Cinemagz App is not officially affiliated with TMDB.
             </Text>
           </View>
         </ScrollView>
