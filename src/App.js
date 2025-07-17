@@ -1,9 +1,10 @@
+import React, { useRef } from 'react';
 import {
   NavigationContainer,
   useNavigationContainerRef,
 } from '@react-navigation/native';
-import React, { useRef } from 'react';
 import { StatusBar, LogBox } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import Navigations from './navigations';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -48,6 +49,7 @@ const App = () => {
                 backgroundColor={tw.color('primaryDark')}
                 barStyle="light-content"
               />
+              <Toast />
               <Navigations />
             </NavigationContainer>
           </SafeAreaView>
