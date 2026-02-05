@@ -26,16 +26,16 @@ export default function HomeScreen({ navigation }) {
     resultMovieUpcoming,
     isLoadingMovieUpcoming,
     onRefetchMovieUpcoming,
-  } = useMovieUpcoming();
+  } = useMovieUpcoming(getUser?.countryCode);
   const {
     resultMovieNowplaying,
     isLoadingMovieNowplaying,
     onRefetchMovieNowplaying,
-  } = useMovieNowplaying();
+  } = useMovieNowplaying(getUser?.countryCode);
   const { resultMovieGenre, isLoadingMovieGenre, onRefetchMovieGenre } =
     useMovieGenre();
   const { resultMoviePopular, isLoadingMoviePopular, onRefetchMoviePopular } =
-    useMoviePopular();
+    useMoviePopular(getUser?.countryCode);
 
   const selectedGenreId = useMemo(() => {
     return category === 'All'

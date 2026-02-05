@@ -8,7 +8,7 @@ import { Button, Header, ProfileItem } from '../../components/commons';
 import {
   IconAlert,
   IconEditProfile,
-  // IconFinish,
+  IconFinish,
   // IconGlobe,
   // IconNotification,
   IconPadlock,
@@ -117,6 +117,10 @@ export default function ProfileScreen({ navigation }) {
     navigation.navigate('AboutScreen');
   }, [navigation]);
 
+  const handleNavigateToCountry = useCallback(() => {
+    navigation.navigate('CountryScreen');
+  }, [navigation]);
+
   return (
     <>
       <View style={tw.style('flex-1 bg-primaryDark')}>
@@ -172,22 +176,27 @@ export default function ProfileScreen({ navigation }) {
               isLastItem
             />
           </ProfileSection>
-          {/* <ProfileSection title="General" styles={tw.style('mb-4')}>
-            <ProfileItem
+          <ProfileSection title="General" styles={tw.style('mb-4')}>
+            {/* <ProfileItem
               title="Notification"
               iconLeft={<IconNotification />}
               onPress={() => {
                 navigation.navigate('NotificationScreen');
               }}
-            />
-            <ProfileItem title="Language" iconLeft={<IconGlobe />} />
-            <ProfileItem title="Country" iconLeft={<IconFinish />} />
+            /> */}
+            {/* <ProfileItem title="Language" iconLeft={<IconGlobe />} /> */}
             <ProfileItem
+              title="Country"
+              iconLeft={<IconFinish />}
+              onPress={handleNavigateToCountry}
+              isLastItem
+            />
+            {/* <ProfileItem
               title="Clear Cache"
               iconLeft={<IconTrash />}
               isLastItem
-            />
-          </ProfileSection> */}
+            /> */}
+          </ProfileSection>
           <ProfileSection title="More" styles={tw.style('mb-10')}>
             <ProfileItem
               title="Privacy and Policy"

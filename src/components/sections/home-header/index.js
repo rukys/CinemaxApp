@@ -3,7 +3,7 @@ import React from 'react';
 import tw from '../../../../tailwind';
 import { Gap } from '../../commons';
 import { useNavigation } from '@react-navigation/native';
-import { IconNotification, ImgProfile } from '../../../assets';
+import { ImgProfile } from '../../../assets';
 import FastImage from 'react-native-fast-image';
 
 const HomeHeaderSection = ({ data = {} }) => {
@@ -27,7 +27,7 @@ const HomeHeaderSection = ({ data = {} }) => {
           Let's find your favorite movie
         </Text>
       </View>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => {
           navigation.navigate('NotificationScreen');
         }}
@@ -35,7 +35,7 @@ const HomeHeaderSection = ({ data = {} }) => {
           'h-10 w-10 bg-primarySoft items-center justify-center rounded-xl',
         )}>
         <IconNotification />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <Gap width={16} />
     </View>
   );

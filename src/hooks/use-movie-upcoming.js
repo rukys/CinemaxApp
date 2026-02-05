@@ -1,9 +1,9 @@
 import { useQuery } from 'react-query';
 import { getMovieUpcoming } from '../services/root-api';
 
-export default function useMovieUpcoming() {
+export default function useMovieUpcoming(params = '') {
   const queryMovieUpcoming = useQuery(
-    ['get-movie-upcoming'],
+    ['get-movie-upcoming', { countryCode: params }],
     getMovieUpcoming,
     {
       staleTime: 5 * 60 * 1000, // 5 menit

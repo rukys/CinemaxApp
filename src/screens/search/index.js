@@ -8,14 +8,17 @@ import useMovieNowplaying from '../../hooks/use-movie-nowplaying';
 import useMovieGenre from '../../hooks/use-movie-genre';
 import useMovieSearch from '../../hooks/use-movie-search';
 import { ImgNoResult } from '../../assets';
+import { userStore } from '../../stores';
 
 export default function SearchScreen({ navigation }) {
   const [valueSearch, setValueSearch] = useState('');
 
+  const getUser = userStore(state => state.user);
+
   const { resultMovieSearch, isLoadingMovieSearch } =
     useMovieSearch(valueSearch);
-  const { resultMovieToprated } = useMovieToprated();
-  const { moviesToday } = useMovieNowplaying();
+  const { resultMovieToprated } = useMovieToprated(getUser?.countryCode);
+  const { moviesToday } = useMovieNowplaying(getUser?.countryCode);
   const { getGenreNames } = useMovieGenre();
 
   const handleSearchChange = useCallback(val => {

@@ -56,10 +56,7 @@ export default function SignupScreen({ navigation }) {
 
         setUser(storeSignup);
         saveUserToFirestore(storeSignup);
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'AppBarScreen' }],
-        });
+        navigation.replace('CountryScreen', { isFromSignup: true });
       }
     });
   }, [
@@ -128,6 +125,7 @@ export default function SignupScreen({ navigation }) {
             />
             <View style={tw.style('flex-row mt-2')}>
               <CheckBox
+                value={isCheckBox}
                 onValueChange={handleCheckboxChange}
                 style={tw.style('mr-4')}
                 tintColors={tw.color('textGrey')}

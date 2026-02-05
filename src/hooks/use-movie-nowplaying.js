@@ -1,12 +1,12 @@
 import { useQuery } from 'react-query';
 import { getMovieNowPlaying } from '../services/root-api';
 
-export default function useMovieNowplaying() {
+export default function useMovieNowplaying(params = '') {
   // const today = new Date('2025-06-11').toISOString().split('T')[0];
   const today = new Date().toISOString().split('T')[0];
 
   const queryMovieNowplaying = useQuery(
-    ['get-movie-nowplaying'],
+    ['get-movie-nowplaying', { countryCode: params }],
     getMovieNowPlaying,
     {
       staleTime: 5 * 60 * 1000, // 5 menit

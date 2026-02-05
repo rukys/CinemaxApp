@@ -1,9 +1,9 @@
 import { useQuery } from 'react-query';
 import { getMovieTrending } from '../services/root-api';
 
-export default function useMovieTrending() {
+export default function useMovieTrending(params = '') {
   const queryMovieTrending = useQuery(
-    ['get-movie-trending'],
+    ['get-movie-trending', { countryCode: params }],
     getMovieTrending,
     {
       staleTime: 5 * 60 * 1000, // 5 menit

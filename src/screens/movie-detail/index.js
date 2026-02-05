@@ -229,8 +229,10 @@ export default function MovieDetailScreen({ navigation, route }) {
 
   useFocusEffect(
     useCallback(() => {
-      onUpdateFavorite();
-    }, []),
+      if (resultMovieDetail?.id || getUser?.id) {
+        onUpdateFavorite();
+      }
+    }, [resultMovieDetail?.id, getUser?.id]),
   );
 
   return (

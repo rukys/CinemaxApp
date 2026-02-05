@@ -23,7 +23,7 @@ const Header = ({
       <View style={tw.style('flex-1 items-center', isOnBackPress && '-ml-6')}>
         <Text
           style={tw.style(
-            'text-textWhite font-montserratSemiBold text-base self-center',
+            'ml-6 text-center text-start text-textWhite font-montserratSemiBold text-base',
           )}>
           {title}
         </Text>

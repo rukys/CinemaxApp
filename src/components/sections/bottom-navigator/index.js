@@ -8,7 +8,7 @@ const BottomNavigator = ({ state, descriptors, navigation }) => {
     <View style={tw.style('bg-white')}>
       <View
         style={tw.style(
-          'flex-row justify-between items-center px-10 pb-1 pt-3.5 shadow-2xl bg-primaryDark',
+          'flex-row justify-between items-center px-10 pb-2 pt-2 shadow-2xl bg-primaryDark',
         )}>
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];

@@ -33,6 +33,15 @@ export default function useStoreFirebase() {
     }
   };
 
+  const updateUserCountryCode = async (uid, countryCode) => {
+    try {
+      const userRef = firestore().collection('users').doc(uid);
+      await userRef.update({ countryCode });
+    } catch (error) {
+      throw new Error('Failed to update country code: ' + error.message);
+    }
+  };
+
   const deleteUserFireStore = async uid => {
     try {
       const docRef = firestore().collection('users').doc(uid);
@@ -165,6 +174,7 @@ export default function useStoreFirebase() {
     saveUserToFirestore,
     getUserFromFirestore,
     updateUserToFirestore,
+    updateUserCountryCode,
     deleteUserFireStore,
     listenToUserData,
 

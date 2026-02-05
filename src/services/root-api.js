@@ -9,7 +9,8 @@ export const getConfigLanguages = () => {
   });
 };
 
-const apiConfigCountries = () => `${API_HOST}configuration/countires`;
+const apiConfigCountries = () =>
+  `${API_HOST}configuration/countries?language=en-US`;
 export const getConfigCountries = () => {
   return fetchApi({
     url: apiConfigCountries(),
@@ -17,11 +18,12 @@ export const getConfigCountries = () => {
 };
 
 // -- function get movie --
-const apiMovieTrending = () =>
-  `${API_HOST}trending/movie/day?language=en-US&page=1&region=ID`;
-export const getMovieTrending = () => {
+const apiMovieTrending = (countryCode = '') =>
+  `${API_HOST}trending/movie/day?language=en-US&page=1&region=${countryCode}`;
+export const getMovieTrending = ({ queryKey }) => {
+  const [, { countryCode }] = queryKey;
   return fetchApi({
-    url: apiMovieTrending(),
+    url: apiMovieTrending(countryCode),
   });
 };
 
@@ -32,40 +34,44 @@ export const getMovieGenre = () => {
   });
 };
 
-const apiMovieNowPlaying = () =>
-  `${API_HOST}movie/now_playing?language=en-US&page=1&region=ID`;
-export const getMovieNowPlaying = () => {
+const apiMovieNowPlaying = (countryCode = '') =>
+  `${API_HOST}movie/now_playing?language=en-US&page=1&region=${countryCode}`;
+export const getMovieNowPlaying = ({ queryKey }) => {
+  const [, { countryCode }] = queryKey;
   return fetchApi({
-    url: apiMovieNowPlaying(),
+    url: apiMovieNowPlaying(countryCode),
   });
 };
 
-const apiMoviePopular = () =>
-  `${API_HOST}movie/popular?language=en-US&page=1&region=ID`;
-export const getMoviePopular = () => {
+const apiMoviePopular = (countryCode = '') =>
+  `${API_HOST}movie/popular?language=en-US&page=1&region=${countryCode}`;
+export const getMoviePopular = ({ queryKey }) => {
+  const [, { countryCode }] = queryKey;
   return fetchApi({
-    url: apiMoviePopular(),
+    url: apiMoviePopular(countryCode),
   });
 };
 
-const apiMovieTopRated = () =>
-  `${API_HOST}movie/top_rated?language=en-US&page=1&region=ID`;
-export const getMovieTopRated = () => {
+const apiMovieTopRated = (countryCode = '') =>
+  `${API_HOST}movie/top_rated?language=en-US&page=1&region=${countryCode}`;
+export const getMovieTopRated = ({ queryKey }) => {
+  const [, { countryCode }] = queryKey;
   return fetchApi({
-    url: apiMovieTopRated(),
+    url: apiMovieTopRated(countryCode),
   });
 };
 
-const apiMovieUpcoming = () =>
-  `${API_HOST}movie/upcoming?language=en-US&page=1&region=ID`;
-export const getMovieUpcoming = () => {
+const apiMovieUpcoming = (countryCode = '') =>
+  `${API_HOST}movie/upcoming?language=en-US&page=1&region=${countryCode}`;
+export const getMovieUpcoming = ({ queryKey }) => {
+  const [, { countryCode }] = queryKey;
   return fetchApi({
-    url: apiMovieUpcoming(),
+    url: apiMovieUpcoming(countryCode),
   });
 };
 
 const apiMovieSearch = (keyword = '') =>
-  `${API_HOST}search/movie?query=${keyword}&language=en-US&page=1&region=ID`;
+  `${API_HOST}search/movie?query=${keyword}&language=en-US&page=1`;
 export const getMovieSearch = ({ queryKey }) => {
   const [, { keyword }] = queryKey;
   return fetchApi({

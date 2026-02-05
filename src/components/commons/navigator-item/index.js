@@ -87,7 +87,7 @@ const NavigatorIcon = ({ title, active }) => {
       <Animated.View
         style={[
           tw.style(
-            'h-10 flex-row bg-primarySoft items-center p-2 px-3 rounded-xl',
+            'h-10 flex-row bg-primarySoft items-center p-2 px-3 rounded-xl mb-1',
           ),
           {
             opacity: containerAnim,
@@ -119,7 +119,7 @@ const NavigatorIcon = ({ title, active }) => {
 
   // Inactive state - simpler container without background
   return (
-    <View style={tw.style('items-center justify-center')}>
+    <View style={tw.style('items-center justify-center mb-1')}>
       <DefaultIcon />
     </View>
   );

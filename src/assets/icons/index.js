@@ -51,6 +51,16 @@ import IconPersonFill from './person-fill.svg';
 import IconEditProfile from './edit-profile.svg';
 import IconArrowRight from './arrow-right.svg';
 import IconHeartRed from './heart-red.svg';
+import IconFlagAmerica from './icon-flag-america.svg';
+import IconFlagBrazil from './icon-flag-brazil.svg';
+import IconFlagChina from './icon-flag-china.svg';
+import IconFlagGerman from './icon-flag-german.svg';
+import IconFlagIndonesia from './icon-flag-indonesia.svg';
+import IconFlagItalian from './icon-flag-italian.svg';
+import IconFlagJapan from './icon-flag-japan.svg';
+import IconFlagKorea from './icon-flag-korea.svg';
+import IconFlagSpanish from './icon-flag-spanish.svg';
+import IconFlagUK from './icon-flag-uk.svg';
 
 export {
   IconApp,
@@ -106,4 +116,14 @@ export {
   IconStarOrange,
   IconHeartRed,
   IconEditProfileDetail,
+  IconFlagAmerica,
+  IconFlagBrazil,
+  IconFlagChina,
+  IconFlagGerman,
+  IconFlagIndonesia,
+  IconFlagItalian,
+  IconFlagJapan,
+  IconFlagKorea,
+  IconFlagSpanish,
+  IconFlagUK,
 };
