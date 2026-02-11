@@ -9,6 +9,7 @@ import CardPoster from './card-poster';
 import CardList from './card-list';
 import CastCrewItem from './cast-crew-item';
 import CardCountry from './card-country';
+import ThumbnailItem from './thumbnail-item';
 
 export {
   Gap,
@@ -22,4 +23,5 @@ export {
   CardList,
   CastCrewItem,
   CardCountry,
+  ThumbnailItem,
 };

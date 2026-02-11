@@ -2,36 +2,51 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, TouchableOpacity, View } from 'react-native';
 import tw from '../../../../tailwind';
-import {
-  IconHeart,
-  IconHeartFill,
-  IconHome,
-  IconHomeFill,
-  IconPerson,
-  IconPersonFill,
-  IconSearch,
-  IconSearchFill,
-} from '../../../assets';
+import { Heart, Home, Search, User } from 'lucide-react-native';
 
 const iconMap = {
   HomeScreen: {
-    default: IconHome,
-    active: IconHomeFill,
+    default: () => <Home color={tw.color('white')} size={24} />,
+    active: () => (
+      <Home
+        size={24}
+        color={tw.color('primaryBlueAccent')}
+        fill={tw.color('primaryBlueAccent')}
+      />
+    ),
     label: 'Home',
   },
   SearchScreen: {
-    default: IconSearch,
-    active: IconSearchFill,
+    default: () => <Search color={tw.color('white')} size={24} />,
+    active: () => (
+      <Search
+        size={24}
+        color={tw.color('primaryBlueAccent')}
+        fill={tw.color('primaryBlueAccent')}
+      />
+    ),
     label: 'Search',
   },
   FavoriteScreen: {
-    default: IconHeart,
-    active: IconHeartFill,
+    default: () => <Heart color={tw.color('white')} size={24} />,
+    active: () => (
+      <Heart
+        size={24}
+        color={tw.color('primaryBlueAccent')}
+        fill={tw.color('primaryBlueAccent')}
+      />
+    ),
     label: 'Favorite',
   },
   ProfileScreen: {
-    default: IconPerson,
-    active: IconPersonFill,
+    default: () => <User color={tw.color('white')} size={24} />,
+    active: () => (
+      <User
+        size={24}
+        color={tw.color('primaryBlueAccent')}
+        fill={tw.color('primaryBlueAccent')}
+      />
+    ),
     label: 'Profile',
   },
 };

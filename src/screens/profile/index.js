@@ -4,22 +4,17 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import deviceInfoModule from 'react-native-device-info';
 import auth from '@react-native-firebase/auth';
 import tw from '../../../tailwind';
-import { Button, Header, ProfileItem } from '../../components/commons';
 import {
-  IconAlert,
-  IconEditProfile,
-  IconFinish,
-  // IconGlobe,
-  // IconNotification,
-  IconPadlock,
-  IconPerson,
-  // IconQuestion,
-  IconRemove,
-  IconShield,
-  // IconTrash,
-  ImgProfile,
-  ImgQuestion,
-} from '../../assets';
+  CircleMinus,
+  Flag,
+  Info,
+  LockKeyhole,
+  Shield,
+  SquarePen,
+  User,
+} from 'lucide-react-native';
+import { Button, Header, ProfileItem } from '../../components/commons';
+import { ImgProfile, ImgQuestion } from '../../assets';
 import { globalStore, userStore } from '../../stores';
 import { ProfileSection } from '../../components/sections';
 import useAuthFirebase from '../../hooks/use-auth-firebase';
@@ -152,24 +147,24 @@ export default function ProfileScreen({ navigation }) {
               </Text>
             </View>
             <TouchableOpacity onPress={handleNavigateToEditProfile}>
-              <IconEditProfile />
+              <SquarePen color={tw.color('primaryBlueAccent')} size={24} />
             </TouchableOpacity>
           </View>
 
           <ProfileSection title="Account" styles={tw.style('mb-4')}>
             <ProfileItem
               title="Edit Profile"
-              iconLeft={<IconPerson />}
+              iconLeft={<User color={tw.color('white')} size={24} />}
               onPress={handleNavigateToEditProfile}
             />
             <ProfileItem
               title="Change Password"
-              iconLeft={<IconPadlock />}
+              iconLeft={<LockKeyhole color={tw.color('white')} size={24} />}
               onPress={handleNavigateToChangePassword}
             />
             <ProfileItem
               title="Delete Account"
-              iconLeft={<IconRemove />}
+              iconLeft={<CircleMinus color={tw.color('white')} size={24} />}
               onPress={() => {
                 setVisibleModalDelete(true);
               }}
@@ -187,7 +182,7 @@ export default function ProfileScreen({ navigation }) {
             {/* <ProfileItem title="Language" iconLeft={<IconGlobe />} /> */}
             <ProfileItem
               title="Country"
-              iconLeft={<IconFinish />}
+              iconLeft={<Flag color={tw.color('white')} size={24} />}
               onPress={handleNavigateToCountry}
               isLastItem
             />
@@ -200,14 +195,14 @@ export default function ProfileScreen({ navigation }) {
           <ProfileSection title="More" styles={tw.style('mb-10')}>
             <ProfileItem
               title="Privacy and Policy"
-              iconLeft={<IconShield />}
+              iconLeft={<Shield color={tw.color('white')} size={24} />}
               onPress={handleNavigateToPrivacyPolicy}
             />
             {/* <ProfileItem title="Help & Feedback" iconLeft={<IconQuestion />} /> */}
             <ProfileItem
               isLastItem
               title="About Us"
-              iconLeft={<IconAlert />}
+              iconLeft={<Info color={tw.color('white')} size={24} />}
               onPress={handleNavigateToAbout}
             />
           </ProfileSection>

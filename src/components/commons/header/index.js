@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity } from 'react-native';
 import React from 'react';
 import tw from '../../../../tailwind';
-import { IconArrowBack } from '../../../assets';
+import { ChevronLeft } from 'lucide-react-native';
 
 const Header = ({
   title = '',
@@ -17,13 +17,13 @@ const Header = ({
           style={tw.style(
             'h-8 w-8 bg-primarySoft rounded-lg items-center justify-center',
           )}>
-          <IconArrowBack />
+          <ChevronLeft color={tw.color('white')} size={24} />
         </TouchableOpacity>
       )}
       <View style={tw.style('flex-1 items-center', isOnBackPress && '-ml-6')}>
         <Text
           style={tw.style(
-            'ml-6 text-center text-start text-textWhite font-montserratSemiBold text-base',
+            'text-center text-start text-textWhite font-montserratSemiBold text-base',
           )}>
           {title}
         </Text>

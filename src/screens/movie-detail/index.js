@@ -9,26 +9,32 @@ import {
   TouchableOpacity,
   RefreshControl,
   Dimensions,
+  Pressable,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import ImageView from 'react-native-image-viewing';
 import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
 import tw from '../../../tailwind';
 import { Button, Header } from '../../components/commons';
 import { ImageBackdrop } from '../../constants';
 import useMovieGenre from '../../hooks/use-movie-genre';
-import {
-  IconCalendar,
-  IconHeartFill,
-  IconHeartRed,
-  IconShare,
-  IconStarOrange,
-} from '../../assets';
 import useMovieDetail from '../../hooks/use-movie-detail';
 import useStoreFirebase from '../../hooks/use-store-firebase';
-import { CastCrewSection, HomeSection } from '../../components/sections';
+import {
+  CastCrewSection,
+  HomeSection,
+  ThumbnailSection,
+} from '../../components/sections';
 import ReactNativeModal from 'react-native-modal';
 import { globalStore, userStore } from '../../stores';
+import {
+  Calendar,
+  Heart,
+  SquareArrowOutUpRight,
+  Star,
+} from 'lucide-react-native';
+import useMovieVideos from '../../hooks/use-movie-videos';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -61,6 +67,7 @@ export default function MovieDetailScreen({ navigation, route }) {
 
   const [isAtTop, setIsAtTop] = useState(true);
 
+  const [visiblePoster, setVisiblePoster] = useState(false);
   const [visibleModal, setVisibleModal] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [valCastCrew, setValCastCrew] = useState({});
@@ -80,6 +87,10 @@ export default function MovieDetailScreen({ navigation, route }) {
     onRefetchMovieDetailCredits,
     onRefetchMovieDetailSimilar,
   } = useMovieDetail(movieData?.id);
+
+  const { videoThumbnails, isLoadingMovieVideos } = useMovieVideos(
+    movieData?.id,
+  );
 
   const { saveFavoriteMovie, getFavoriteMovie, deleteFavoriteMovie } =
     useStoreFirebase();
@@ -161,6 +172,10 @@ export default function MovieDetailScreen({ navigation, route }) {
     setVisibleModal(true);
   }, []);
 
+  const onPressThumbnail = useCallback(item => {
+    navigation.navigate('WebViewScreen', { url: item?.videoUrl || '' });
+  }, []);
+
   const handleModalClose = useCallback(() => {
     setVisibleModal(false);
   }, []);
@@ -185,7 +200,14 @@ export default function MovieDetailScreen({ navigation, route }) {
 
   const onScroll = useCallback(event => {
     const offsetY = event.nativeEvent.contentOffset.y;
-    setIsAtTop(offsetY <= 0);
+    const shouldBeAtTop = offsetY <= 0;
+
+    setIsAtTop(prev => {
+      if (prev !== shouldBeAtTop) {
+        return shouldBeAtTop;
+      }
+      return prev;
+    });
   }, []);
 
   const isLoadingRefreshScreen = useMemo(() => {
@@ -194,7 +216,8 @@ export default function MovieDetailScreen({ navigation, route }) {
       isLoadingMovieDetail ||
       isLoadingMovieGenre ||
       isLoadingMovieDetailCredits ||
-      isLoadingMovieDetailSimilar
+      isLoadingMovieDetailSimilar ||
+      isLoadingMovieVideos
     );
   }, [
     isLoading,
@@ -291,18 +314,29 @@ export default function MovieDetailScreen({ navigation, route }) {
             onBackPress={onBackPress}
           />
           <View style={tw.style('items-center mb-8')}>
-            <FastImage
-              source={{ uri: urlImageBackdrop }}
-              resizeMode="cover"
-              style={tw.style('h-90 w-65% rounded-xl mb-6')}
-            />
+            <Pressable
+              onPress={() => setVisiblePoster(true)}
+              style={tw.style('h-90 w-65% rounded-xl mb-6')}>
+              <FastImage
+                source={{ uri: urlImageBackdrop }}
+                resizeMode="cover"
+                style={tw.style('h-full w-full rounded-xl')}
+              />
+            </Pressable>
             <View style={tw.style('flex-row items-center mb-2')}>
-              <IconCalendar />
+              <Calendar
+                color={tw.color('textWhite')}
+                size={16}
+                style={tw.style('mr-1')}
+              />
               <Text style={tw.style('ml-1 text-white font-montserrat')}>
                 {formatDateWithPrefix(resultMovieDetail?.release_date)}
               </Text>
             </View>
-            <Text style={tw.style('text-white text-base font-montserrat')}>
+            <Text
+              style={tw.style(
+                'text-white text-center text-base font-montserrat',
+              )}>
               {genreText}
             </Text>
           </View>
@@ -312,7 +346,11 @@ export default function MovieDetailScreen({ navigation, route }) {
                 style={tw.style(
                   'flex-row items-center bg-primarySoft px-4 rounded-full mr-2',
                 )}>
-                <IconStarOrange height={25} width={25} />
+                <Star
+                  size={25}
+                  color={tw.color('secondaryOrange')}
+                  fill={tw.color('secondaryOrange')}
+                />
                 <Text
                   style={tw.style(
                     'text-secondaryOrange text-base font-montserratSemiBold ml-2',
@@ -332,13 +370,25 @@ export default function MovieDetailScreen({ navigation, route }) {
               style={tw.style(
                 'h-14 bg-primarySoft justify-center p-4 rounded-full ml-2 mr-2',
               )}>
-              {isFavorite ? <IconHeartRed /> : <IconHeartFill />}
+              {isFavorite ? (
+                <Heart
+                  size={25}
+                  color={tw.color('secondaryRed')}
+                  fill={tw.color('secondaryRed')}
+                />
+              ) : (
+                <Heart
+                  size={25}
+                  color={tw.color('primaryBlueAccent')}
+                  fill={tw.color('primaryBlueAccent')}
+                />
+              )}
             </TouchableOpacity>
             <TouchableOpacity
               style={tw.style(
                 'h-14 bg-primarySoft justify-center p-4 rounded-full ml-2',
               )}>
-              <IconShare />
+              <SquareArrowOutUpRight color={tw.color('white')} size={25} />
             </TouchableOpacity>
           </View>
           <View style={tw.style('px-4 bg-primaryDark')}>
@@ -352,6 +402,27 @@ export default function MovieDetailScreen({ navigation, route }) {
               {resultMovieDetail?.overview || ''}
             </Text>
           </View>
+
+          <View style={tw.style('px-4 bg-primaryDark')}>
+            <Text
+              style={tw.style(
+                'text-base text-white font-montserratSemiBold mb-2 mt-2',
+              )}>
+              Duration
+            </Text>
+            <Text style={tw.style('text-white font-montserrat mb-2')}>
+              {resultMovieDetail?.runtime || ''} Minutes
+            </Text>
+          </View>
+
+          <ThumbnailSection
+            title="Trailer & Teaser"
+            data={videoThumbnails}
+            styles={tw.style('bg-primaryDark pt-2 pb-2')}
+            onPressThumbnail={item => {
+              onPressThumbnail(item);
+            }}
+          />
 
           <CastCrewSection
             title="Cast"
@@ -385,6 +456,13 @@ export default function MovieDetailScreen({ navigation, route }) {
           />
         </ScrollView>
       </View>
+
+      <ImageView
+        images={[{ uri: urlImageBackdrop }]}
+        imageIndex={0}
+        visible={visiblePoster}
+        onRequestClose={() => setVisiblePoster(false)}
+      />
 
       <ReactNativeModal
         isVisible={visibleModal}

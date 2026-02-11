@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity } from 'react-native';
 import React from 'react';
 import tw from '../../../../tailwind';
-import { IconArrowRight } from '../../../assets';
+import { ChevronRight } from 'lucide-react-native';
 
 const ProfileItem = ({
   iconLeft,
@@ -27,7 +27,7 @@ const ProfileItem = ({
       <Text style={tw.style('flex-1 ml-4 text-white font-montserrat')}>
         {title}
       </Text>
-      <IconArrowRight />
+      <ChevronRight color={tw.color('primaryBlueAccent')} size={24} />
     </TouchableOpacity>
   );
 };

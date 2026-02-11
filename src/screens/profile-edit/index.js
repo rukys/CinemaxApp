@@ -5,10 +5,11 @@ import Modal from 'react-native-modal';
 import tw from '../../../tailwind';
 import { Button, Header, Input } from '../../components/commons';
 import FastImage from 'react-native-fast-image';
-import { IconEditProfileDetail, ImgProfile, ImgSuccess } from '../../assets';
+import { ImgProfile, ImgSuccess } from '../../assets';
 import { globalStore, userStore } from '../../stores';
 import useStoreFirebase from '../../hooks/use-store-firebase';
 import { useFocusEffect } from '@react-navigation/native';
+import { Camera } from 'lucide-react-native';
 
 export default function ProfileEditScreen({ navigation }) {
   const [valPhoneNumber, setValPhoneNumber] = useState('');
@@ -91,8 +92,10 @@ export default function ProfileEditScreen({ navigation }) {
                 style={tw.style('h-32 w-32 mr-4')}
               />
               <TouchableOpacity
-                style={tw.style('absolute bottom-0 right-0 mr-4')}>
-                <IconEditProfileDetail />
+                style={tw.style(
+                  'absolute bottom-0 right-0 mr-4 bg-primaryDark p-2 rounded-full items-center justify-center',
+                )}>
+                <Camera color={tw.color('primaryBlueAccent')} size={18} />
               </TouchableOpacity>
             </TouchableOpacity>
 

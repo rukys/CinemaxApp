@@ -137,11 +137,19 @@ export default function SignupScreen({ navigation }) {
                   'flex-1 font-montserratMedium text-textGrey text-sm',
                 )}>
                 I agree to the{' '}
-                <Text style={tw.style('text-primaryBlueAccent')}>
+                <Text
+                  style={tw.style('text-primaryBlueAccent')}
+                  onPress={() => {
+                    navigation.navigate('PrivacyPolicyScreen');
+                  }}>
                   Terms and Services
                 </Text>{' '}
                 and{' '}
-                <Text style={tw.style('text-primaryBlueAccent')}>
+                <Text
+                  style={tw.style('text-primaryBlueAccent')}
+                  onPress={() => {
+                    navigation.navigate('PrivacyPolicyScreen');
+                  }}>
                   Privacy Policy
                 </Text>
               </Text>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import tw from '../../../../tailwind';
-import { IconSearch } from '../../../assets';
+import { Search } from 'lucide-react-native';
 
 const SearchSection = ({
   styles,
@@ -22,10 +22,10 @@ const SearchSection = ({
           'flex-1 bg-primarySoft py-3 px-4 rounded-3xl flex-row items-center',
           styles,
         )}>
-        <IconSearch />
+        <Search color={tw.color('white')} size={24} style={tw.style('mr-1')} />
         {isOnPress ? (
           <Text style={tw.style('ml-2 text-textGrey font-montserratMedium')}>
-            Search by title
+            Search Movie...
           </Text>
         ) : (
           <TextInput

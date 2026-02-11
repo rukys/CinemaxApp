@@ -2,7 +2,7 @@
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import tw from '../../../../tailwind';
-import { IconEyeOff } from '../../../assets';
+import { Eye, EyeOff } from 'lucide-react-native';
 
 const Input = ({
   styles,
@@ -70,7 +70,11 @@ const Input = ({
           onPress={() => {
             setSecureText(!secureText);
           }}>
-          <IconEyeOff />
+          {secureText ? (
+            <EyeOff color={tw.color('white')} size={24} />
+          ) : (
+            <Eye color={tw.color('white')} size={24} />
+          )}
         </TouchableOpacity>
       )}
     </View>

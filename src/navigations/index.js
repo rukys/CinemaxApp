@@ -21,6 +21,7 @@ import {
   SigninScreen,
   SignupScreen,
   SplashScreen,
+  WebViewScreen,
 } from '../screens';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { BottomNavigator } from '../components/sections';
@@ -72,6 +73,7 @@ const Navigations = () => {
       <Stack.Screen name="MovieDetailScreen" component={MovieDetailScreen} />
       <Stack.Screen name="LanguageScreen" component={LanguageScreen} />
       <Stack.Screen name="CountryScreen" component={CountryScreen} />
+      <Stack.Screen name="WebViewScreen" component={WebViewScreen} />
       <Stack.Screen
         name="PrivacyPolicyScreen"
         component={PrivacyPolicyScreen}

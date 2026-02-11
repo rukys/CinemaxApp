@@ -17,6 +17,7 @@ import LanguageScreen from './language';
 import CountryScreen from './country';
 import HelpFaqScreen from './help-faq';
 import AboutScreen from './about';
+import WebViewScreen from './webview';
 
 export {
   HomeScreen,
@@ -38,4 +39,5 @@ export {
   CountryScreen,
   HelpFaqScreen,
   AboutScreen,
+  WebViewScreen,
 };

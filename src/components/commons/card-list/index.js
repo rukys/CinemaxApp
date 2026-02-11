@@ -3,7 +3,7 @@ import React from 'react';
 import FastImage from 'react-native-fast-image';
 import { ImageCard } from '../../../constants';
 import tw from '../../../../tailwind';
-import { IconCalendar, IconStarOrange } from '../../../assets';
+import { Calendar, Star } from 'lucide-react-native';
 
 const CardList = ({
   image,
@@ -41,7 +41,11 @@ const CardList = ({
             style={tw.style(
               'flex-row items-center w-16 p-2 rounded-lg bg-primarySoft',
             )}>
-            <IconStarOrange />
+            <Star
+              size={16}
+              color={tw.color('secondaryOrange')}
+              fill={tw.color('secondaryOrange')}
+            />
             <Text
               style={tw.style(
                 'text-secondaryOrange font-montserratSemiBold ml-2 ',
@@ -58,7 +62,11 @@ const CardList = ({
           {title}
         </Text>
         <View style={tw.style('flex-row items-center mb-2')}>
-          <IconCalendar />
+          <Calendar
+            color={tw.color('textWhite')}
+            size={16}
+            style={tw.style('mr-1')}
+          />
           <Text style={tw.style('text-textGrey font-montserrat ml-2')}>
             {relaseDate}
           </Text>
