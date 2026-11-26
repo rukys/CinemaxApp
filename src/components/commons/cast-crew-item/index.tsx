@@ -4,7 +4,13 @@ import FastImage from '@d11/react-native-fast-image';
 import tw from '../../../../tailwind';
 import { ImageCastAndCrew } from '../../../constants';
 
-const CastCrewItem = ({ image = '', fullName = '', onPress = () => {} }) => {
+interface Props {
+  image?: string | null;
+  fullName?: string;
+  onPress?: () => void;
+}
+
+const CastCrewItem = ({ image = '', fullName = '', onPress = () => {} }: Props) => {
   const urlImage = ImageCastAndCrew(image);
 
   return (

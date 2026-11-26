@@ -5,8 +5,12 @@ import FastImage from '@d11/react-native-fast-image';
 import tw from '../../../../tailwind';
 import { ImageBackdrop } from '../../../constants';
 
-const formatDateWithPrefix = (dateString, prefix = 'On') => {
-  const date = new Date(dateString);
+const formatDateWithPrefix = (
+  dateString: string | undefined,
+  prefix = 'On',
+) => {
+  // `new Date(undefined)` is an Invalid Date, same as the original JS.
+  const date = new Date(dateString as string);
 
   const formattedDate = date.toLocaleDateString('en-US', {
     year: 'numeric',
@@ -17,12 +21,19 @@ const formatDateWithPrefix = (dateString, prefix = 'On') => {
   return `${prefix} ${formattedDate}`;
 };
 
+interface Props {
+  image?: string | null;
+  title?: string;
+  releaseDate?: string;
+  onPress?: () => void;
+}
+
 const Carouselitem = ({
   image,
   title = '',
   releaseDate,
   onPress = () => {},
-}) => {
+}: Props) => {
   const urlImg = ImageBackdrop(image) || '';
 
   return (

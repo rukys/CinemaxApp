@@ -5,8 +5,13 @@ import { Gap } from '../../commons';
 import { useNavigation } from '@react-navigation/native';
 import { ImgProfile } from '../../../assets';
 import FastImage from '@d11/react-native-fast-image';
+import type { UserProfile } from '../../../types/user';
 
-const HomeHeaderSection = ({ data = {} }) => {
+interface Props {
+  data?: Partial<UserProfile>;
+}
+
+const HomeHeaderSection = ({ data = {} }: Props) => {
   const navigation = useNavigation();
 
   return (
@@ -27,15 +32,6 @@ const HomeHeaderSection = ({ data = {} }) => {
           Let's find your favorite movie
         </Text>
       </View>
-      {/* <TouchableOpacity
-        onPress={() => {
-          navigation.navigate('NotificationScreen');
-        }}
-        style={tw.style(
-          'h-10 w-10 bg-primarySoft items-center justify-center rounded-xl',
-        )}>
-        <IconNotification />
-      </TouchableOpacity> */}
       <Gap width={16} />
     </View>
   );

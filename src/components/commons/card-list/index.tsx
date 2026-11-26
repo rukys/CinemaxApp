@@ -5,14 +5,24 @@ import { ImageCard } from '../../../constants';
 import tw from '../../../../tailwind';
 import { Calendar, Star } from 'lucide-react-native';
 
+interface Props {
+  image?: string | null;
+  title?: string;
+  releaseDate?: string;
+  /** vote_average; favorites store it as a string. */
+  rated?: number | string;
+  genreName?: string[];
+  onPressCard?: () => void;
+}
+
 const CardList = ({
   image,
   title = '',
-  relaseDate = '',
+  releaseDate = '',
   rated = 0,
   genreName = [],
   onPressCard = () => {},
-}) => {
+}: Props) => {
   const urlImage = ImageCard(image) || '';
   const genreText = genreName.join(' | ');
 
@@ -68,7 +78,7 @@ const CardList = ({
             style={tw.style('mr-1')}
           />
           <Text style={tw.style('text-textGrey font-montserrat ml-2')}>
-            {relaseDate}
+            {releaseDate}
           </Text>
         </View>
         <View style={tw.style('')}>

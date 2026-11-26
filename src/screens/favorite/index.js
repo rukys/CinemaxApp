@@ -121,7 +121,7 @@ export default function FavoriteScreen({ navigation }) {
                   key={index.toString()}
                   image={item?.posterPath}
                   title={item?.title}
-                  relaseDate={item?.releaseDate}
+                  releaseDate={item?.releaseDate}
                   rated={Number(item?.rated)}
                   genreName={getGenreNames(safeParseArray(item?.genres))}
                   onPressCard={() => handleMovieDetailPress(item)}

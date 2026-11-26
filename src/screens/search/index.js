@@ -131,7 +131,7 @@ export default function SearchScreen({ navigation }) {
               image={moviesToday[0]?.poster_path}
               title={moviesToday[0]?.title}
               key={moviesToday[0]?.id}
-              relaseDate={moviesToday[0]?.release_date}
+              releaseDate={moviesToday[0]?.release_date}
               genreName={getGenreNames(moviesToday[0]?.genre_ids)}
               onPressCard={handleTodayMoviePress}
             />
@@ -158,7 +158,7 @@ export default function SearchScreen({ navigation }) {
                 key={index.toString()}
                 image={item?.poster_path}
                 title={item?.title}
-                relaseDate={item?.release_date}
+                releaseDate={item?.release_date}
                 rated={item?.vote_average}
                 genreName={getGenreNames(item?.genre_ids)}
                 onPressCard={() => handleMovieDetailPress(item)}

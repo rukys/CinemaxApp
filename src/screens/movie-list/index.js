@@ -83,7 +83,7 @@ export default function MovieListScreen({ navigation, route }) {
             key={item?.id?.toString()}
             image={item?.poster_path}
             title={item?.title}
-            relaseDate={item?.release_date}
+            releaseDate={item?.release_date}
             rated={item?.vote_average}
             genreName={getGenreNames(item?.genre_ids)}
             onPressCard={() => handleMovieDetailPress(item)}

@@ -1,7 +1,32 @@
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  type TextInputProps,
+  type TextStyle,
+  type ViewStyle,
+} from 'react-native';
 import React, { useState } from 'react';
 import tw from '../../../../tailwind';
 import { Eye, EyeOff } from 'lucide-react-native';
+
+// The three style props are merged through `tw.style`, so they must be
+// plain style objects. Any other TextInput prop is passed through.
+interface Props
+  extends Omit<
+    TextInputProps,
+    'style' | 'value' | 'onChangeText' | 'editable' | 'secureTextEntry'
+  > {
+  styles?: ViewStyle;
+  labelStyles?: TextStyle;
+  textInputStyles?: TextStyle;
+  label?: string;
+  value?: string;
+  onChangeText?: (text: string) => void;
+  isSecureText?: boolean;
+  isEditable?: boolean;
+}
 
 const Input = ({
   styles,
@@ -13,7 +38,7 @@ const Input = ({
   isSecureText = false,
   isEditable = true,
   ...props
-}) => {
+}: Props) => {
   const [isFocused, setIsFocused] = useState(false);
   const [secureText, setSecureText] = useState(isSecureText);
 

@@ -1,7 +1,16 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, type ViewStyle } from 'react-native';
 import React from 'react';
 import tw from '../../../../tailwind';
 import { ChevronRight } from 'lucide-react-native';
+
+interface Props {
+  iconLeft?: React.ReactNode;
+  title?: string;
+  isLastItem?: boolean;
+  /** Merged through `tw.style`, so it must be a plain style object. */
+  styles?: ViewStyle;
+  onPress?: () => void;
+}
 
 const ProfileItem = ({
   iconLeft,
@@ -9,7 +18,7 @@ const ProfileItem = ({
   isLastItem = false,
   styles,
   onPress = () => {},
-}) => {
+}: Props) => {
   return (
     <TouchableOpacity
       onPress={onPress}

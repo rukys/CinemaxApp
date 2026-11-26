@@ -1,9 +1,14 @@
 import React from 'react';
 import { View } from 'react-native';
+import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { NavigatorItem } from '../../commons';
 import tw from '../../../../tailwind';
 
-const BottomNavigator = ({ state, descriptors, navigation }) => {
+const BottomNavigator = ({
+  state,
+  descriptors,
+  navigation,
+}: BottomTabBarProps) => {
   return (
     <View style={tw.style('bg-white')}>
       <View
@@ -12,8 +17,11 @@ const BottomNavigator = ({ state, descriptors, navigation }) => {
         )}>
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
+          // NavigatorItem picks the icon by name, so only a string label
+          // can be used. No tab sets tabBarLabel/title, so this is the
+          // route name.
           const label =
-            options.tabBarLabel !== undefined
+            typeof options.tabBarLabel === 'string'
               ? options.tabBarLabel
               : options.title !== undefined
               ? options.title
@@ -43,7 +51,6 @@ const BottomNavigator = ({ state, descriptors, navigation }) => {
           return (
             <NavigatorItem
               key={index}
-              size={22}
               title={label}
               active={isFocused}
               onPress={onPress}

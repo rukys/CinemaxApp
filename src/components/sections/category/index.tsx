@@ -1,15 +1,30 @@
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  type ViewStyle,
+} from 'react-native';
 import React from 'react';
 import tw from '../../../../tailwind';
 import { Gap } from '../../commons';
+import type { Genre } from '../../../types/tmdb';
+
+interface Props {
+  /** Merged through `tw.style`, so it must be a plain style object. */
+  styles?: ViewStyle;
+  dataCategory?: Genre[];
+  selectedCategory?: string;
+  onSelectCategory?: (name: string) => void;
+}
 
 const CategorySection = ({
   styles,
   dataCategory = [],
   selectedCategory = 'All',
   onSelectCategory = () => {},
-}) => {
-  const valueAll = {
+}: Props) => {
+  const valueAll: Genre = {
     id: 1,
     name: 'All',
   };

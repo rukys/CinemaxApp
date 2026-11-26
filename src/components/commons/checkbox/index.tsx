@@ -1,11 +1,18 @@
 import React from 'react';
-import { Pressable } from 'react-native';
+import { Pressable, type ViewStyle } from 'react-native';
 import { Check } from 'lucide-react-native';
 import tw from '../../../../tailwind';
 
+interface Props {
+  value?: boolean;
+  onValueChange?: (value: boolean) => void;
+  /** Merged through `tw.style`, so it must be a plain style object. */
+  styles?: ViewStyle;
+}
+
 // JS-only checkbox. Replaces @react-native-community/checkbox so the app
 // does not depend on a native module for a simple toggle.
-const Checkbox = ({ value = false, onValueChange = () => {}, styles }) => {
+const Checkbox = ({ value = false, onValueChange = () => {}, styles }: Props) => {
   return (
     <Pressable
       accessibilityRole="checkbox"

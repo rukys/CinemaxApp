@@ -1,14 +1,27 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 import React from 'react';
 import tw from '../../../../tailwind';
 import { ChevronLeft } from 'lucide-react-native';
+
+interface Props {
+  title?: string;
+  isOnBackPress?: boolean;
+  onBackPress?: () => void;
+  styles?: StyleProp<ViewStyle>;
+}
 
 const Header = ({
   title = '',
   isOnBackPress = true,
   onBackPress = () => {},
   styles,
-}) => {
+}: Props) => {
   return (
     <View style={[tw.style('flex-row items-center'), styles]}>
       {isOnBackPress && (

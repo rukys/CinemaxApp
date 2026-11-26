@@ -1,7 +1,18 @@
 import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, type ViewStyle } from 'react-native';
 import tw from '../../../../tailwind';
 import { CardPoster, Gap } from '../../commons';
+import type { Movie } from '../../../types/tmdb';
+
+interface Props {
+  dataHomeSection?: Movie[];
+  title?: string;
+  onPressSeeAll?: () => void;
+  onPressHomeSection?: (item: Movie) => void;
+  /** Merged through `tw.style`, so it must be a plain style object. */
+  styles?: ViewStyle;
+  isSeeAll?: boolean;
+}
 
 const HomeSection = ({
   dataHomeSection = [],
@@ -10,7 +21,7 @@ const HomeSection = ({
   onPressHomeSection = () => {},
   styles,
   isSeeAll = true,
-}) => {
+}: Props) => {
   return (
     <View style={tw.style('', styles)}>
       <View style={tw.style('flex-row mx-4 mb-4')}>

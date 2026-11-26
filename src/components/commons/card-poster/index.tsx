@@ -1,10 +1,23 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, type ViewStyle } from 'react-native';
 import React from 'react';
 import FastImage from '@d11/react-native-fast-image';
 import { ImageCard } from '../../../constants';
 import tw from '../../../../tailwind';
 
-const CardPoster = ({ image, title = '', styles, onPressCard = () => {} }) => {
+interface Props {
+  image?: string | null;
+  title?: string;
+  /** Merged through `tw.style`, so it must be a plain style object. */
+  styles?: ViewStyle;
+  onPressCard?: () => void;
+}
+
+const CardPoster = ({
+  image,
+  title = '',
+  styles,
+  onPressCard = () => {},
+}: Props) => {
   const urlImage = ImageCard(image) || '';
   return (
     <TouchableOpacity
@@ -30,7 +43,6 @@ const CardPoster = ({ image, title = '', styles, onPressCard = () => {} }) => {
 
       <View style={tw.style('p-4')}>
         <Text
-          lineBreakMode="tail"
           numberOfLines={1}
           style={tw.style('text-white font-montserratSemiBold')}>
           {title}

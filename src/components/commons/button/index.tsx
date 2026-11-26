@@ -1,6 +1,23 @@
-import { ActivityIndicator, Text, TouchableOpacity } from 'react-native';
+import {
+  ActivityIndicator,
+  Text,
+  TouchableOpacity,
+  type StyleProp,
+  type TextStyle,
+  type ViewStyle,
+} from 'react-native';
 import React from 'react';
 import tw from '../../../../tailwind';
+
+interface Props {
+  textButton?: string;
+  onPress?: () => void;
+  styles?: StyleProp<ViewStyle>;
+  /** Merged through `tw.style`, so it must be a plain style object. */
+  textStyles?: TextStyle;
+  isDisabled?: boolean;
+  isLoading?: boolean;
+}
 
 const Button = ({
   textButton = '',
@@ -9,7 +26,7 @@ const Button = ({
   textStyles,
   isDisabled = false,
   isLoading = false,
-}) => {
+}: Props) => {
   return (
     <TouchableOpacity
       onPress={onPress}

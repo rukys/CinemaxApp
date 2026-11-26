@@ -4,7 +4,14 @@ import { Animated, TouchableOpacity, View } from 'react-native';
 import tw from '../../../../tailwind';
 import { Heart, Home, Search, User } from 'lucide-react-native';
 
-const iconMap = {
+interface IconConfig {
+  default: () => React.JSX.Element;
+  active: () => React.JSX.Element;
+  label: string;
+}
+
+// Keyed by tab route name.
+const iconMap: Record<string, IconConfig> = {
   HomeScreen: {
     default: () => <Home color={tw.color('white')} size={24} />,
     active: () => (
@@ -51,7 +58,12 @@ const iconMap = {
   },
 };
 
-const NavigatorIcon = ({ title, active }) => {
+interface NavigatorIconProps {
+  title: string;
+  active: boolean;
+}
+
+const NavigatorIcon = ({ title, active }: NavigatorIconProps) => {
   const containerAnim = useRef(new Animated.Value(active ? 1 : 0)).current;
   const textOpacityAnim = useRef(new Animated.Value(active ? 1 : 0)).current;
 
@@ -140,7 +152,15 @@ const NavigatorIcon = ({ title, active }) => {
   );
 };
 
-const NavigatorItem = ({ title, active, onPress, onLongPress }) => {
+interface Props {
+  /** Tab route name, e.g. "HomeScreen". */
+  title: string;
+  active: boolean;
+  onPress?: () => void;
+  onLongPress?: () => void;
+}
+
+const NavigatorItem = ({ title, active, onPress, onLongPress }: Props) => {
   const pressAnim = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {

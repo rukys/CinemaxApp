@@ -1,7 +1,27 @@
 import React from 'react';
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  type TextStyle,
+  type ViewStyle,
+} from 'react-native';
 import tw from '../../../../tailwind';
 import { Search } from 'lucide-react-native';
+
+interface Props {
+  /** Merged through `tw.style`, so it must be a plain style object. */
+  styles?: ViewStyle;
+  onPress?: () => void;
+  onCancel?: () => void;
+  isOnPress?: boolean;
+  placeholder?: string;
+  value?: string;
+  onChangeText?: (text: string) => void;
+  /** Merged through `tw.style`, so it must be a plain style object. */
+  textInputStyles?: TextStyle;
+}
 
 const SearchSection = ({
   styles,
@@ -12,7 +32,7 @@ const SearchSection = ({
   value = '',
   onChangeText,
   textInputStyles,
-}) => {
+}: Props) => {
   return (
     <View style={tw.style('flex-row')}>
       <TouchableOpacity

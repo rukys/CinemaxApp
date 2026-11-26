@@ -1,8 +1,15 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, type ViewStyle } from 'react-native';
 import tw from '../../../../tailwind';
 
-const ProfileSection = ({ children, title = '', styles }) => {
+interface Props {
+  children?: React.ReactNode;
+  title?: string;
+  /** Merged through `tw.style`, so it must be a plain style object. */
+  styles?: ViewStyle;
+}
+
+const ProfileSection = ({ children, title = '', styles }: Props) => {
   return (
     <View
       style={tw.style(

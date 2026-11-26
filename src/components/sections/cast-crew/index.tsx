@@ -1,14 +1,25 @@
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, type ViewStyle } from 'react-native';
 import React from 'react';
-import { ThumbnailItem, Gap } from '../../commons';
+import { CastCrewItem, Gap } from '../../commons';
 import tw from '../../../../tailwind';
+import type { CastMember, CrewMember } from '../../../types/tmdb';
 
-const ThumbnailSection = ({
+type CastCrew = CastMember | CrewMember;
+
+interface Props {
+  data?: CastCrew[];
+  title?: string;
+  onPressCastCrew?: (item: CastCrew) => void;
+  /** Merged through `tw.style`, so it must be a plain style object. */
+  styles?: ViewStyle;
+}
+
+const CastCrewSection = ({
   data = [],
   title = '',
-  onPressThumbnail = () => {},
+  onPressCastCrew = () => {},
   styles,
-}) => {
+}: Props) => {
   return (
     <View style={tw.style('', styles)}>
       <View style={tw.style('flex-row mx-4 mb-4')}>
@@ -22,11 +33,12 @@ const ThumbnailSection = ({
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <Gap width={16} />
         {data.map((item, index) => (
-          <ThumbnailItem
+          <CastCrewItem
             key={index?.toString()}
-            thumbnailUrl={item?.thumbnailUrl}
+            image={item?.profile_path}
+            fullName={item?.name}
             onPress={() => {
-              onPressThumbnail(item);
+              onPressCastCrew(item);
             }}
           />
         ))}
@@ -36,4 +48,4 @@ const ThumbnailSection = ({
   );
 };
 
-export default ThumbnailSection;
+export default CastCrewSection;

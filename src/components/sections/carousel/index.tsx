@@ -1,21 +1,33 @@
 import React, { useRef } from 'react';
-import { Dimensions, View } from 'react-native';
+import { Dimensions, View, type ViewStyle } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
-import { Carousel, Pagination } from 'react-native-reanimated-carousel';
+import {
+  Carousel,
+  Pagination,
+  type CarouselRef,
+} from 'react-native-reanimated-carousel';
 import tw from '../../../../tailwind';
 import { Carouselitem } from '../../commons';
+import type { Movie } from '../../../types/tmdb';
 
 const width = Dimensions.get('window').width;
+
+interface Props {
+  dataCarousel?: Movie[];
+  /** Merged through `tw.style`, so it must be a plain style object. */
+  styles?: ViewStyle;
+  onPressCarousel?: (item: Movie) => void;
+}
 
 const CarouselSection = ({
   dataCarousel = [],
   styles,
   onPressCarousel = () => {},
-}) => {
-  const refCarousel = useRef(null);
+}: Props) => {
+  const refCarousel = useRef<CarouselRef>(null);
   const progress = useSharedValue(0);
 
-  const onPressPagination = index => {
+  const onPressPagination = (index: number) => {
     refCarousel.current?.scrollTo({ index, animated: true });
   };
 

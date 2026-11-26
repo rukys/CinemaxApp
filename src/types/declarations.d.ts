@@ -6,8 +6,10 @@ declare module '*.svg' {
   export default content;
 }
 
+// Metro resolves `require`d images to a numeric asset id. Typed as that
+// number so it fits both <Image> and <FastImage> `source`.
 declare module '*.png' {
-  import type { ImageSourcePropType } from 'react-native';
-  const value: ImageSourcePropType;
+  import type { ImageRequireSource } from 'react-native';
+  const value: ImageRequireSource;
   export default value;
 }

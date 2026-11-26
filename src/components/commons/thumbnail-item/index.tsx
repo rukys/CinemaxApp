@@ -4,7 +4,12 @@ import FastImage from '@d11/react-native-fast-image';
 import tw from '../../../../tailwind';
 import { Play } from 'lucide-react-native';
 
-const ThumbnailItem = ({ thumbnailUrl = '', onPress = () => {} }) => {
+interface Props {
+  thumbnailUrl?: string | null;
+  onPress?: () => void;
+}
+
+const ThumbnailItem = ({ thumbnailUrl = '', onPress = () => {} }: Props) => {
   return (
     <TouchableOpacity
       style={tw.style('w-42 items-center mr-2')}
