@@ -2,7 +2,6 @@ import React, { useState, useCallback, useMemo } from 'react';
 import Modal from 'react-native-modal';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import deviceInfoModule from 'react-native-device-info';
-import auth from '@react-native-firebase/auth';
 import tw from '../../../tailwind';
 import {
   CircleMinus,
@@ -13,22 +12,30 @@ import {
   SquarePen,
   User,
 } from 'lucide-react-native';
-import { Button, Header, ProfileItem } from '../../components/commons';
+import {
+  Button,
+  Header,
+  Input,
+  ProfileItem,
+} from '../../components/commons';
 import { ImgProfile, ImgQuestion } from '../../assets';
-import { globalStore, userStore } from '../../stores';
+import { userStore } from '../../stores';
 import { ProfileSection } from '../../components/sections';
 import useAuthFirebase from '../../hooks/use-auth-firebase';
 import FastImage from 'react-native-fast-image';
 import useStoreFirebase from '../../hooks/use-store-firebase';
+import { getAuthErrorMessage } from '../../utils/firebase-error';
 
 export default function ProfileScreen({ navigation }) {
   const [visibleModal, setVisibleModal] = useState(false);
   const [visibleModalDelete, setVisibleModalDelete] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteError, setDeleteError] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const getUser = userStore(state => state.user);
   const setUser = userStore(state => state.setUser);
-  const setLoading = globalStore(state => state.setLoading);
-  const loading = globalStore(state => state.loading);
+  const [loading, setLoading] = useState(false);
 
   const userProfileData = useMemo(
     () => ({
@@ -38,7 +45,7 @@ export default function ProfileScreen({ navigation }) {
     [getUser?.fullName, getUser?.email],
   );
 
-  const { logout } = useAuthFirebase();
+  const { logout, reauthenticate } = useAuthFirebase();
   const { deleteUserFireStore, deleteAllFavoriteMovie } = useStoreFirebase();
 
   const onClearCacheApp = useCallback(() => {
@@ -63,33 +70,59 @@ export default function ProfileScreen({ navigation }) {
       });
   }, [logout, onClearCacheApp, setLoading]);
 
-  const handlePressDeleteAccount = useCallback(async () => {
-    const user = auth().currentUser;
-
-    if (user) {
-      try {
-        await deleteAllFavoriteMovie(user.uid || getUser?.id);
-        await deleteUserFireStore(user.uid || getUser?.id);
-        await user.delete();
-        await handlePressLogout();
-      } catch (error) {
-        if (error.code === 'auth/requires-recent-login') {
-          // console.log(
-          //   'Re-authentication required before deleting the account.',
-          // );
-          // Arahkan user untuk login ulang
-        } else {
-          // console.error('Failed to delete user:', error);
-        }
-      }
-    } else {
-      // console.log('No user is currently signed in.');
+  const handleCloseDeleteModal = useCallback(() => {
+    if (isDeleting) {
+      return;
     }
+    setVisibleModalDelete(false);
+    setDeletePassword('');
+    setDeleteError('');
+  }, [isDeleting]);
+
+  // Order matters: re-authenticate first so nothing is deleted when the
+  // password is wrong, then remove Firestore data, then the auth account.
+  const handlePressDeleteAccount = useCallback(async () => {
+    if (!deletePassword) {
+      setDeleteError(getAuthErrorMessage('auth/missing-password'));
+      return;
+    }
+
+    setIsDeleting(true);
+    setDeleteError('');
+
+    let user = null;
+    try {
+      user = await reauthenticate(deletePassword);
+    } catch (error) {
+      setDeleteError(getAuthErrorMessage(error));
+      setIsDeleting(false);
+      return;
+    }
+
+    try {
+      await deleteAllFavoriteMovie(user.uid);
+      await deleteUserFireStore(user.uid);
+      await user.delete();
+    } catch (error) {
+      setDeleteError(
+        error?.code
+          ? getAuthErrorMessage(error)
+          : 'Failed to delete your account. Please try again.',
+      );
+      setIsDeleting(false);
+      return;
+    }
+
+    setIsDeleting(false);
+    setDeletePassword('');
+    // Deleting the auth account also signs the user out.
+    onClearCacheApp();
   }, [
+    deletePassword,
+    reauthenticate,
     deleteAllFavoriteMovie,
     deleteUserFireStore,
-    getUser?.id,
-    handlePressLogout,
+    onClearCacheApp,
   ]);
 
   const appVersion = useMemo(() => {
@@ -271,9 +304,9 @@ export default function ProfileScreen({ navigation }) {
 
       <Modal
         isVisible={visibleModalDelete}
-        onBackdropPress={() => {
-          setVisibleModalDelete(false);
-        }}>
+        avoidKeyboard
+        onBackdropPress={handleCloseDeleteModal}
+        onBackButtonPress={handleCloseDeleteModal}>
         <View style={tw.style('bg-primarySoft p-5 rounded-3xl')}>
           <View style={tw.style('self-center mb-2 mt-2')}>
             <ImgQuestion height={125} width={125} />
@@ -291,9 +324,25 @@ export default function ProfileScreen({ navigation }) {
             This will permanently remove your profile, history, and settings.
             This action cannot be undone.
           </Text>
+          <Input
+            label="Password"
+            value={deletePassword}
+            isSecureText
+            onChangeText={setDeletePassword}
+            labelStyles={tw.style('bg-primarySoft')}
+            styles={tw.style('mb-2 border-textGrey')}
+          />
+          <Text
+            style={tw.style(
+              'text-secondaryRed text-xs font-montserrat mb-4 ml-4',
+            )}>
+            {deleteError}
+          </Text>
           <View style={tw.style('flex-row mb-2')}>
             <Button
               textButton="Delete"
+              isLoading={isDeleting}
+              isDisabled={isDeleting}
               onPress={handlePressDeleteAccount}
               textStyles={tw.style('text-primaryBlueAccent')}
               styles={tw.style(
@@ -302,10 +351,9 @@ export default function ProfileScreen({ navigation }) {
             />
             <Button
               textButton="Cancel"
+              isDisabled={isDeleting}
               styles={tw.style('flex-1 ml-2')}
-              onPress={() => {
-                setVisibleModalDelete(false);
-              }}
+              onPress={handleCloseDeleteModal}
             />
           </View>
         </View>

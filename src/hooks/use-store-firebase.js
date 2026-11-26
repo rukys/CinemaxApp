@@ -1,6 +1,6 @@
 import firestore from '@react-native-firebase/firestore';
 
-export default function useStoreFirebase() {
+function createStoreFirebase() {
   // -- user --//
   const saveUserToFirestore = async userData => {
     try {
@@ -36,22 +36,18 @@ export default function useStoreFirebase() {
   const updateUserCountryCode = async (uid, countryCode) => {
     try {
       const userRef = firestore().collection('users').doc(uid);
-      await userRef.update({ countryCode });
+      // merge: true also works when the profile document does not exist yet.
+      await userRef.set({ countryCode }, { merge: true });
     } catch (error) {
       throw new Error('Failed to update country code: ' + error.message);
     }
   };
 
+  // Deleting a missing document is a no-op in Firestore, so a user whose
+  // profile document was never created can still delete their account.
   const deleteUserFireStore = async uid => {
     try {
-      const docRef = firestore().collection('users').doc(uid);
-      const snapshot = await docRef.get();
-      if (!snapshot.exists) {
-        throw new Error('User not found');
-      }
-
-      await docRef.delete();
-      return snapshot.data();
+      await firestore().collection('users').doc(uid).delete();
     } catch (error) {
       throw new Error('Failed to delete user data: ' + error.message);
     }
@@ -184,4 +180,12 @@ export default function useStoreFirebase() {
     deleteFavoriteMovie,
     deleteAllFavoriteMovie,
   };
+}
+
+// The functions do not depend on React state, so one shared instance keeps
+// their references stable across renders (safe to use in hook deps).
+const storeFirebase = createStoreFirebase();
+
+export default function useStoreFirebase() {
+  return storeFirebase;
 }
