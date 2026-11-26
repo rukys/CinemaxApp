@@ -66,3 +66,19 @@ yarn ios
 If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
 
 This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+
+## Android Release Signing
+
+Release signing values are **not** stored in this repository. Before building a signed release (`yarn aabRelease` / `yarn apkRelease`):
+
+1. Copy the upload keystore file into `android/app/` (it is ignored by git via the `*.keystore` pattern), or to any path you prefer.
+2. Add these values to your user-level `~/.gradle/gradle.properties` (not the project's `android/gradle.properties`), or set them as environment variables in CI:
+
+```properties
+MYAPP_UPLOAD_STORE_FILE=my-upload-key.keystore
+MYAPP_UPLOAD_KEY_ALIAS=your-key-alias
+MYAPP_UPLOAD_STORE_PASSWORD=*****
+MYAPP_UPLOAD_KEY_PASSWORD=*****
+```
+
+`MYAPP_UPLOAD_STORE_FILE` is resolved relative to `android/app/`. If any value is missing or the keystore file does not exist, the release build is produced unsigned and debug builds keep working.

@@ -12,6 +12,21 @@ def enableProguardInReleaseBuilds = false
 
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+/**
+ * Release signing. Never commit these values to the repo.
+ * Set them in ~/.gradle/gradle.properties (local) or as environment variables (CI).
+ */
+def readSigningValue(String name) {
+    def value = project.findProperty(name) ?: System.getenv(name)
+    return value ? value.toString() : null
+}
+def releaseStoreFile = readSigningValue('MYAPP_UPLOAD_STORE_FILE')
+def releaseStorePassword = readSigningValue('MYAPP_UPLOAD_STORE_PASSWORD')
+def releaseKeyAlias = readSigningValue('MYAPP_UPLOAD_KEY_ALIAS')
+def releaseKeyPassword = readSigningValue('MYAPP_UPLOAD_KEY_PASSWORD')
+def hasReleaseSigning = releaseStoreFile && releaseStorePassword && releaseKeyAlias &&
+        releaseKeyPassword && file(releaseStoreFile).exists()
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -32,12 +47,12 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-        release {
-            if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
-                storeFile file(MYAPP_UPLOAD_STORE_FILE)
-                storePassword MYAPP_UPLOAD_STORE_PASSWORD
-                keyAlias MYAPP_UPLOAD_KEY_ALIAS
-                keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+        if (hasReleaseSigning) {
+            release {
+                storeFile file(releaseStoreFile)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
             }
         }
     }
@@ -46,9 +61,12 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
+            // Release signing values are read from ~/.gradle/gradle.properties or
+            // environment variables (see README). Without them, the release build is unsigned.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.release
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
