@@ -1,3 +1,10 @@
 {
-  "extends": "@react-native/typescript-config/tsconfig.json"
+  "extends": "@react-native/typescript-config",
+  "compilerOptions": {
+    "strict": true,
+    "allowJs": true,
+    "checkJs": false
+  },
+  "include": ["src", "index.js", "__tests__", "tailwind.js", "src/types/*.d.ts"],
+  "exclude": ["node_modules", "android", "ios", "**/Pods/**"]
 }
