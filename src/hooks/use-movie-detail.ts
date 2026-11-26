@@ -12,7 +12,8 @@ const EMPTY_CREW: CrewMember[] = [];
 const EMPTY_MOVIES: Movie[] = [];
 
 // Videos are fetched by `use-movie-videos` to avoid a duplicate request.
-export default function useMovieDetail(movieId?: number) {
+// `movieId` is a string when the movie comes from a stored favorite.
+export default function useMovieDetail(movieId?: number | string) {
   const id = movieId ?? 0;
   const enabled = Boolean(movieId);
 

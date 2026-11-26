@@ -11,8 +11,12 @@ import {
   MIN_PASSWORD_LENGTH,
 } from '../../utils/firebase-error';
 import { showErrorToast } from '../../utils/toast';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../../navigations/types';
 
-export default function SignupScreen({ navigation }) {
+type Props = StackScreenProps<RootStackParamList, 'SignupScreen'>;
+
+export default function SignupScreen({ navigation }: Props) {
   const setUser = userStore(state => state.setUser);
 
   const { registerWithEmail, deleteAccount } = useAuthFirebase();
@@ -25,19 +29,19 @@ export default function SignupScreen({ navigation }) {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleFullNameChange = useCallback(value => {
+  const handleFullNameChange = useCallback((value: string) => {
     setFullName(value);
   }, []);
 
-  const handleEmailChange = useCallback(value => {
+  const handleEmailChange = useCallback((value: string) => {
     setEmail(value);
   }, []);
 
-  const handlePasswordChange = useCallback(value => {
+  const handlePasswordChange = useCallback((value: string) => {
     setPassword(value);
   }, []);
 
-  const handleCheckboxChange = useCallback(value => {
+  const handleCheckboxChange = useCallback((value: boolean) => {
     setIsCheckBox(value);
   }, []);
 
@@ -86,12 +90,12 @@ export default function SignupScreen({ navigation }) {
       await saveUserToFirestore(storeSignup);
       setUser(storeSignup);
       navigation.replace('CountryScreen', { isFromSignup: true });
-    } catch (error) {
+    } catch {
       // Roll back the new auth account so the user can sign up again with
       // the same email instead of being stuck without a profile.
       try {
         await deleteAccount(user);
-      } catch (rollbackError) {
+      } catch {
         // Ignore: nothing else we can do on the client.
       }
       showErrorToast('Failed to save your profile. Please try again.');

@@ -5,11 +5,18 @@ import { Button, Header, Input } from '../../components/commons';
 import useAuthFirebase from '../../hooks/use-auth-firebase';
 import {
   getAuthErrorMessage,
+  getErrorCode,
   MIN_PASSWORD_LENGTH,
 } from '../../utils/firebase-error';
 import { showErrorToast, showSuccessToast } from '../../utils/toast';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../../navigations/types';
 
-const getValidationError = (oldPassword, newPassword, confirmPassword) => {
+const getValidationError = (
+  oldPassword: string,
+  newPassword: string,
+  confirmPassword: string,
+) => {
   if (newPassword.length < MIN_PASSWORD_LENGTH) {
     return `New password must be at least ${MIN_PASSWORD_LENGTH} characters.`;
   }
@@ -22,7 +29,9 @@ const getValidationError = (oldPassword, newPassword, confirmPassword) => {
   return '';
 };
 
-export default function ChangePasswordScreen({ navigation }) {
+type Props = StackScreenProps<RootStackParamList, 'ChangePasswordScreen'>;
+
+export default function ChangePasswordScreen({ navigation }: Props) {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -57,8 +66,8 @@ export default function ChangePasswordScreen({ navigation }) {
       navigation.goBack();
     } catch (error) {
       const isWrongOldPassword =
-        error?.code === 'auth/wrong-password' ||
-        error?.code === 'auth/invalid-credential';
+        getErrorCode(error) === 'auth/wrong-password' ||
+        getErrorCode(error) === 'auth/invalid-credential';
       showErrorToast(
         isWrongOldPassword
           ? 'Your old password is incorrect.'
@@ -103,8 +112,7 @@ export default function ChangePasswordScreen({ navigation }) {
             onChangeText={setConfirmPassword}
             styles={tw.style('mx-6 mb-2')}
           />
-          <Text
-            style={tw.style('mx-8 text-textGrey text-xs font-montserrat')}>
+          <Text style={tw.style('mx-8 text-textGrey text-xs font-montserrat')}>
             Password must be at least {MIN_PASSWORD_LENGTH} characters.
           </Text>
         </View>

@@ -3,12 +3,20 @@ import React, { useCallback, useState } from 'react';
 import tw from '../../../tailwind';
 import { Button, Header, Input } from '../../components/commons';
 import useAuthFirebase from '../../hooks/use-auth-firebase';
-import { getAuthErrorMessage, isValidEmail } from '../../utils/firebase-error';
+import {
+  getAuthErrorMessage,
+  getErrorCode,
+  isValidEmail,
+} from '../../utils/firebase-error';
 import { showErrorToast, showSuccessToast } from '../../utils/toast';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../../navigations/types';
+
+type Props = StackScreenProps<RootStackParamList, 'ForgotPassScreen'>;
 
 // Uses Firebase's built-in password reset: the user receives an email with a
 // link and sets the new password on Firebase's hosted page.
-const ForgotPassScreen = ({ navigation }) => {
+const ForgotPassScreen = ({ navigation }: Props) => {
   const [email, setEmail] = useState('');
   const [sentTo, setSentTo] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -16,15 +24,15 @@ const ForgotPassScreen = ({ navigation }) => {
   const { sendPasswordReset } = useAuthFirebase();
 
   const sendResetLink = useCallback(
-    async targetEmail => {
+    async (targetEmail: string) => {
       setIsLoading(true);
       try {
         await sendPasswordReset(targetEmail);
       } catch (error) {
         // Do not reveal whether an account exists for this email.
         if (
-          error?.code !== 'auth/user-not-found' &&
-          error?.code !== 'auth/invalid-credential'
+          getErrorCode(error) !== 'auth/user-not-found' &&
+          getErrorCode(error) !== 'auth/invalid-credential'
         ) {
           showErrorToast(getAuthErrorMessage(error));
           return false;
@@ -89,8 +97,8 @@ const ForgotPassScreen = ({ navigation }) => {
                 style={tw.style(
                   'text-textWhiteGrey font-montserratSemiBold text-xs text-center',
                 )}>
-                Enter the email address of your account and we will send you
-                a link to reset your password.
+                Enter the email address of your account and we will send you a
+                link to reset your password.
               </Text>
             </View>
             <View style={tw.style('mx-6 mb-10')}>

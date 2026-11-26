@@ -30,7 +30,8 @@ export const selectVideoThumbnails = (videos: Video[]): VideoThumbnail[] => {
   return fallback ? [toThumbnail(fallback)] : [];
 };
 
-export default function useMovieVideos(movieId?: number) {
+// `movieId` is a string when the movie comes from a stored favorite.
+export default function useMovieVideos(movieId?: number | string) {
   const id = movieId ?? 0;
   const query = useQuery({
     queryKey: movieKeys.videos(id),

@@ -11,8 +11,18 @@ import {
 import { userStore } from '../../stores';
 import useMovieGenre from '../../hooks/use-movie-genre';
 import useMovieList from '../../hooks/use-movie-list';
+import type { Movie } from '../../types/tmdb';
+import type { CompositeScreenProps } from '@react-navigation/native';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList, TabParamList } from '../../navigations/types';
 
-export default function HomeScreen({ navigation }) {
+type Props = CompositeScreenProps<
+  BottomTabScreenProps<TabParamList, 'HomeScreen'>,
+  StackScreenProps<RootStackParamList>
+>;
+
+export default function HomeScreen({ navigation }: Props) {
   const [category, setCategory] = useState('All');
 
   const getUser = userStore(state => state.user);
@@ -68,7 +78,7 @@ export default function HomeScreen({ navigation }) {
   ]);
 
   const handleMoviePress = useCallback(
-    item => {
+    (item: Movie) => {
       navigation.navigate('MovieDetailScreen', { movieData: item });
     },
     [navigation],
@@ -77,7 +87,7 @@ export default function HomeScreen({ navigation }) {
   const onRefreshScreen = useCallback(async () => {
     setIsLoading(true);
 
-    const minDelay = new Promise(resolve => setTimeout(resolve, 1000));
+    const minDelay = new Promise<void>(resolve => setTimeout(resolve, 1000));
 
     try {
       await Promise.all([

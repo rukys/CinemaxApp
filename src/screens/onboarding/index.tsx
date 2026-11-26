@@ -1,21 +1,14 @@
-import {
-  View,
-  Text,
-  StatusBar,
-  // TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { View, Text, StatusBar, ScrollView } from 'react-native';
 import React from 'react';
 import tw from '../../../tailwind';
-import {
-  // IconApple,
-  IconAppWithoutText,
-  // IconFacebook,
-  // IconGoogle,
-} from '../../assets';
+import { IconAppWithoutText } from '../../assets';
 import { Button, Gap } from '../../components/commons';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../../navigations/types';
 
-export default function OnboardingScreen({ navigation }) {
+type Props = StackScreenProps<RootStackParamList, 'OnboardingScreen'>;
+
+export default function OnboardingScreen({ navigation }: Props) {
   return (
     <>
       <StatusBar barStyle="light-content" />
@@ -59,33 +52,7 @@ export default function OnboardingScreen({ navigation }) {
             </Text>
           </Text>
           <Gap height={48} />
-          {/* <Text
-            style={tw.style(
-              'text-white font-montserratSemiBold text-textGrey text-xs',
-            )}>
-            Or Sign up with
-          </Text> */}
           <Gap height={24} />
-          {/* <View style={tw.style('flex-row')}>
-            <TouchableOpacity
-              style={tw.style(
-                'h-14 w-14 bg-white rounded-full mr-3 items-center justify-center',
-              )}>
-              <IconGoogle height={18} width={18} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={tw.style(
-                'h-14 w-14 bg-primarySoft rounded-full items-center justify-center',
-              )}>
-              <IconApple height={18} width={18} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={tw.style(
-                'h-14 w-14 bg-blueFB rounded-full ml-3 items-center justify-center',
-              )}>
-              <IconFacebook height={18} width={18} />
-            </TouchableOpacity>
-          </View> */}
         </View>
       </ScrollView>
     </>

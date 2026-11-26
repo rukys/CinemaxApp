@@ -5,12 +5,17 @@ import { CardList, Header } from '../../components/commons';
 import { SearchSection } from '../../components/sections';
 import useMovieGenre from '../../hooks/use-movie-genre';
 import { useFocusEffect } from '@react-navigation/native';
+import type { Movie } from '../../types/tmdb';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../../navigations/types';
 
-export default function MovieListScreen({ navigation, route }) {
+type Props = StackScreenProps<RootStackParamList, 'MovieListScreen'>;
+
+export default function MovieListScreen({ navigation, route }: Props) {
   const { movieList = [], title = '' } = route.params || {};
 
   const [searchText, setSearchText] = useState('');
-  const [listMovie, setListMovie] = useState([]);
+  const [listMovie, setListMovie] = useState<Movie[]>([]);
 
   const { getGenreNames } = useMovieGenre();
 
@@ -35,14 +40,14 @@ export default function MovieListScreen({ navigation, route }) {
     });
   }, [searchText, listMovie, getGenreNames]);
 
-  const onChangeSearch = useCallback(val => {
+  const onChangeSearch = useCallback((val: string) => {
     setSearchText(val);
   }, []);
 
   const displayData = searchText === '' ? listMovie : filteredList;
 
   const handleMovieDetailPress = useCallback(
-    item => {
+    (item: Movie) => {
       navigation.navigate('MovieDetailScreen', { movieData: item });
     },
     [navigation],
@@ -78,7 +83,7 @@ export default function MovieListScreen({ navigation, route }) {
         keyExtractor={item => {
           return item?.id?.toString();
         }}
-        renderItem={({ item, index }) => (
+        renderItem={({ item }) => (
           <CardList
             key={item?.id?.toString()}
             image={item?.poster_path}

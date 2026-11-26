@@ -10,7 +10,11 @@ interface Props {
   onPress?: () => void;
 }
 
-const CastCrewItem = ({ image = '', fullName = '', onPress = () => {} }: Props) => {
+const CastCrewItem = ({
+  image = '',
+  fullName = '',
+  onPress = () => {},
+}: Props) => {
   const urlImage = ImageCastAndCrew(image);
 
   return (

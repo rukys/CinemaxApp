@@ -10,10 +10,20 @@ import useMovieSearch from '../../hooks/use-movie-search';
 import { ImgNoResult } from '../../assets';
 import { userStore } from '../../stores';
 import useDebounce from '../../hooks/use-debounce';
+import type { Movie } from '../../types/tmdb';
+import type { CompositeScreenProps } from '@react-navigation/native';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList, TabParamList } from '../../navigations/types';
 
 const SEARCH_DEBOUNCE_MS = 400;
 
-export default function SearchScreen({ navigation }) {
+type Props = CompositeScreenProps<
+  BottomTabScreenProps<TabParamList, 'SearchScreen'>,
+  StackScreenProps<RootStackParamList>
+>;
+
+export default function SearchScreen({ navigation }: Props) {
   const [valueSearch, setValueSearch] = useState('');
 
   const getUser = userStore(state => state.user);
@@ -27,12 +37,18 @@ export default function SearchScreen({ navigation }) {
   const countryCode = getUser?.countryCode ?? '';
   const { movies: resultMovieSearch, isLoading: isLoadingMovieSearch } =
     useMovieSearch(keyword);
-  const { movies: resultMovieToprated } = useMovieList('top_rated', countryCode);
+  const { movies: resultMovieToprated } = useMovieList(
+    'top_rated',
+    countryCode,
+  );
   const { movies: nowPlaying } = useMovieList('now_playing', countryCode);
-  const moviesToday = useMemo(() => filterReleasedToday(nowPlaying), [nowPlaying]);
+  const moviesToday = useMemo(
+    () => filterReleasedToday(nowPlaying),
+    [nowPlaying],
+  );
   const { getGenreNames } = useMovieGenre();
 
-  const handleSearchChange = useCallback(val => {
+  const handleSearchChange = useCallback((val: string) => {
     setValueSearch(val);
   }, []);
 
@@ -56,7 +72,7 @@ export default function SearchScreen({ navigation }) {
   }, [navigation, resultMovieToprated]);
 
   const handleMovieDetailPress = useCallback(
-    item => {
+    (item: Movie) => {
       navigation.navigate('MovieDetailScreen', { movieData: item });
     },
     [navigation],

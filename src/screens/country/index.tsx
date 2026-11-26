@@ -7,8 +7,12 @@ import { listCountry } from '../../constants';
 import useStoreFirebase from '../../hooks/use-store-firebase';
 import { userStore } from '../../stores';
 import { showErrorToast } from '../../utils/toast';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../../navigations/types';
 
-export default function CountryScreen({ navigation, route }) {
+type Props = StackScreenProps<RootStackParamList, 'CountryScreen'>;
+
+export default function CountryScreen({ navigation, route }: Props) {
   const { isFromSignup = false } = route.params || {};
 
   // Selection stays local until the user presses Save.
@@ -54,10 +58,12 @@ export default function CountryScreen({ navigation, route }) {
 
     setIsSaving(true);
     try {
-      await updateUserCountryCode(getUser?.id, valCountry);
+      // A signed-in user always has an id; if it is missing Firestore throws
+      // and the catch below shows the error toast.
+      await updateUserCountryCode(getUser?.id as string, valCountry);
       setUser({ ...getUser, countryCode: valCountry });
       goNext();
-    } catch (error) {
+    } catch {
       showErrorToast('Failed to save your country. Please try again.');
     } finally {
       setIsSaving(false);

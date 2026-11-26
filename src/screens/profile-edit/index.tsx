@@ -9,8 +9,12 @@ import useStoreFirebase from '../../hooks/use-store-firebase';
 import { useFocusEffect } from '@react-navigation/native';
 import { Camera } from 'lucide-react-native';
 import { showErrorToast } from '../../utils/toast';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../../navigations/types';
 
-export default function ProfileEditScreen({ navigation }) {
+type Props = StackScreenProps<RootStackParamList, 'ProfileEditScreen'>;
+
+export default function ProfileEditScreen({ navigation }: Props) {
   const [valPhoneNumber, setValPhoneNumber] = useState('');
   const [visibleModal, setVisibleModal] = useState(false);
 
@@ -52,19 +56,26 @@ export default function ProfileEditScreen({ navigation }) {
     setIsLoading(true);
     try {
       await updateUserToFirestore({
-        id: getUser?.id,
+        // A signed-in user always has an id; if it is missing Firestore
+        // throws and the catch below shows the error toast.
+        id: getUser?.id as string,
         phoneNumber: trimmedPhoneNumber,
       });
       onGetDataProfile();
       setVisibleModal(true);
-    } catch (error) {
+    } catch {
       showErrorToast('Failed to update your profile. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  }, [getUser?.id, trimmedPhoneNumber, updateUserToFirestore, onGetDataProfile]);
+  }, [
+    getUser?.id,
+    trimmedPhoneNumber,
+    updateUserToFirestore,
+    onGetDataProfile,
+  ]);
 
-  const handlePhoneNumberChange = useCallback(text => {
+  const handlePhoneNumberChange = useCallback((text: string) => {
     setValPhoneNumber(text);
   }, []);
 
@@ -129,7 +140,7 @@ export default function ProfileEditScreen({ navigation }) {
             />
             <Input
               label="Email"
-              value={getUser?.email}
+              value={getUser?.email ?? ''}
               styles={tw.style('mx-6 mb-6')}
               isEditable={false}
             />

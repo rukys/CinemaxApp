@@ -2,8 +2,12 @@ import { View } from 'react-native';
 import React, { useCallback } from 'react';
 import tw from '../../../tailwind';
 import { Header } from '../../components/commons';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../../navigations/types';
 
-export default function HelpFaqScreen({ navigation }) {
+type Props = StackScreenProps<RootStackParamList, 'LanguageScreen'>;
+
+export default function LanguageScreen({ navigation }: Props) {
   const handleBackPress = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
@@ -12,7 +16,7 @@ export default function HelpFaqScreen({ navigation }) {
     <>
       <View style={tw.style('flex-1 bg-primaryDark')}>
         <Header
-          title="Help & Feedback"
+          title="Language"
           styles={tw.style('mx-4')}
           onBackPress={handleBackPress}
         />

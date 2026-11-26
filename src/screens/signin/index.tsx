@@ -1,20 +1,23 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import tw from '../../../tailwind';
-import {
-  // IconApple,
-  IconAppWithoutText,
-  // IconFacebook,
-  // IconGoogle,
-} from '../../assets';
+import { IconAppWithoutText } from '../../assets';
 import { Button, Header, Input } from '../../components/commons';
 import useAuthFirebase from '../../hooks/use-auth-firebase';
 import { userStore } from '../../stores';
 import useStoreFirebase from '../../hooks/use-store-firebase';
-import { getAuthErrorMessage, isValidEmail } from '../../utils/firebase-error';
+import {
+  getAuthErrorMessage,
+  getErrorCode,
+  isValidEmail,
+} from '../../utils/firebase-error';
 import { showErrorToast } from '../../utils/toast';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../../navigations/types';
 
-export default function SigninScreen({ navigation }) {
+type Props = StackScreenProps<RootStackParamList, 'SigninScreen'>;
+
+export default function SigninScreen({ navigation }: Props) {
   const setUser = userStore(state => state.setUser);
 
   const [loading, setLoading] = useState(false);
@@ -24,11 +27,11 @@ export default function SigninScreen({ navigation }) {
   const { loginWithEmail } = useAuthFirebase();
   const { getUserFromFirestore } = useStoreFirebase();
 
-  const handleEmailChange = useCallback(value => {
+  const handleEmailChange = useCallback((value: string) => {
     setEmail(value);
   }, []);
 
-  const handlePasswordChange = useCallback(value => {
+  const handlePasswordChange = useCallback((value: string) => {
     setPassword(value);
   }, []);
 
@@ -58,14 +61,21 @@ export default function SigninScreen({ navigation }) {
       });
     } catch (error) {
       showErrorToast(
-        error?.code
+        getErrorCode(error)
           ? getAuthErrorMessage(error)
           : 'Failed to load your profile. Please try again.',
       );
     } finally {
       setLoading(false);
     }
-  }, [email, password, loginWithEmail, getUserFromFirestore, setUser, navigation]);
+  }, [
+    email,
+    password,
+    loginWithEmail,
+    getUserFromFirestore,
+    setUser,
+    navigation,
+  ]);
 
   const isDisabledButton = useMemo(() => {
     return email === '' || password === '';
@@ -130,32 +140,6 @@ export default function SigninScreen({ navigation }) {
             isDisabled={isDisabledButton}
             onPress={handlePressSignin}
           />
-          {/* <Text
-            style={tw.style(
-              'text-white font-montserratSemiBold text-textGrey text-xs self-center mb-6',
-            )}>
-            Or Login with
-          </Text> */}
-          {/* <View style={tw.style('flex-row self-center mb-12')}>
-            <TouchableOpacity
-              style={tw.style(
-                'h-14 w-14 bg-white rounded-full mr-3 items-center justify-center',
-              )}>
-              <IconGoogle height={18} width={18} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={tw.style(
-                'h-14 w-14 bg-primarySoft rounded-full items-center justify-center',
-              )}>
-              <IconApple height={18} width={18} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={tw.style(
-                'h-14 w-14 bg-blueFB rounded-full ml-3 items-center justify-center',
-              )}>
-              <IconFacebook height={18} width={18} />
-            </TouchableOpacity>
-          </View> */}
         </ScrollView>
       </View>
     </>

@@ -2,18 +2,21 @@ import type { MovieListCategory } from '../services/root-api';
 
 // Single place for every React Query key, so invalidation and caching stay
 // consistent across hooks.
+// Movie ids are numbers from TMDB, or strings for stored favorites.
+type MovieId = number | string;
+
 export const movieKeys = {
   all: ['movies'] as const,
   list: (category: MovieListCategory, countryCode: string) =>
     [...movieKeys.all, 'list', category, countryCode] as const,
   genres: () => [...movieKeys.all, 'genres'] as const,
   search: (keyword: string) => [...movieKeys.all, 'search', keyword] as const,
-  detail: (movieId: number) => [...movieKeys.all, 'detail', movieId] as const,
-  credits: (movieId: number) =>
+  detail: (movieId: MovieId) => [...movieKeys.all, 'detail', movieId] as const,
+  credits: (movieId: MovieId) =>
     [...movieKeys.all, 'detail', movieId, 'credits'] as const,
-  videos: (movieId: number) =>
+  videos: (movieId: MovieId) =>
     [...movieKeys.all, 'detail', movieId, 'videos'] as const,
-  similar: (movieId: number) =>
+  similar: (movieId: MovieId) =>
     [...movieKeys.all, 'detail', movieId, 'similar'] as const,
 };
 

@@ -1,9 +1,13 @@
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import React from 'react';
 import tw from '../../../tailwind';
 import { Header } from '../../components/commons';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../../navigations/types';
 
-export default function NotificationScreen({ navigation }) {
+type Props = StackScreenProps<RootStackParamList, 'NotificationScreen'>;
+
+export default function NotificationScreen({ navigation }: Props) {
   return (
     <>
       <View style={tw.style('flex-1 bg-primaryDark')}>
@@ -14,7 +18,6 @@ export default function NotificationScreen({ navigation }) {
             navigation.goBack();
           }}
         />
-        {/* <Text>NotificationScreen</Text> */}
       </View>
     </>
   );

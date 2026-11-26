@@ -3,8 +3,12 @@ import { View } from 'react-native';
 import { WebView } from 'react-native-webview';
 import tw from '../../../tailwind';
 import { Button, Header } from '../../components/commons';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../../navigations/types';
 
-export default function WebViewScreen({ route, navigation }) {
+type Props = StackScreenProps<RootStackParamList, 'WebViewScreen'>;
+
+export default function WebViewScreen({ route, navigation }: Props) {
   const { url = '' } = route.params;
 
   return (

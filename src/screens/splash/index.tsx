@@ -5,17 +5,22 @@ import tw from '../../../tailwind';
 import useAuthFirebase from '../../hooks/use-auth-firebase';
 import useStoreFirebase from '../../hooks/use-store-firebase';
 import { userStore } from '../../stores';
+import type { UserProfile } from '../../types/user';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../../navigations/types';
 
-export default function SplashScreen({ navigation }) {
+type Props = StackScreenProps<RootStackParamList, 'SplashScreen'>;
+
+export default function SplashScreen({ navigation }: Props) {
   const didNavigateRef = useRef(false);
-  const timeoutRef = useRef(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const setUser = userStore(state => state.setUser);
   const { onAuthStateChanged } = useAuthFirebase();
   const { getUserFromFirestore } = useStoreFirebase();
 
   const navigateToAppBar = useCallback(
-    userData => {
+    (_userData: UserProfile) => {
       if (didNavigateRef.current) {
         return;
       }
@@ -63,7 +68,7 @@ export default function SplashScreen({ navigation }) {
           } else {
             navigateToOnboarding();
           }
-        } catch (e) {
+        } catch {
           navigateToOnboarding();
         }
       }, 1500);

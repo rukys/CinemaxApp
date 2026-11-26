@@ -9,10 +9,22 @@ import { userStore } from '../../stores';
 import useMovieGenre from '../../hooks/use-movie-genre';
 import { SearchSection } from '../../components/sections';
 import { safeParseArray } from '../../utils';
+import type { FavoriteMovie } from '../../types/user';
+import type { CompositeScreenProps } from '@react-navigation/native';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList, TabParamList } from '../../navigations/types';
 
-export default function FavoriteScreen({ navigation }) {
+type Props = CompositeScreenProps<
+  BottomTabScreenProps<TabParamList, 'FavoriteScreen'>,
+  StackScreenProps<RootStackParamList>
+>;
+
+export default function FavoriteScreen({ navigation }: Props) {
   const [searchText, setSearchText] = useState('');
-  const [listFavoriteMovie, setListFavoriteMovie] = useState([]);
+  const [listFavoriteMovie, setListFavoriteMovie] = useState<FavoriteMovie[]>(
+    [],
+  );
 
   const getUser = userStore(state => state.user);
 
@@ -44,7 +56,7 @@ export default function FavoriteScreen({ navigation }) {
     return searchText === '' ? listFavoriteMovie : filteredList;
   }, [searchText, listFavoriteMovie, filteredList]);
 
-  const onChangeSearch = useCallback(val => {
+  const onChangeSearch = useCallback((val: string) => {
     setSearchText(val);
   }, []);
 
@@ -65,7 +77,7 @@ export default function FavoriteScreen({ navigation }) {
   }, [getUser?.id, getListFavoriteMovie]);
 
   const handleMovieDetailPress = useCallback(
-    item => {
+    (item: FavoriteMovie) => {
       navigation.navigate('MovieDetailScreen', { movieData: item });
     },
     [navigation],

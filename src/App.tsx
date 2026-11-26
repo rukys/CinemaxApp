@@ -15,7 +15,7 @@ const queryClient = new QueryClient();
 
 const App = () => {
   const navigationRef = useNavigationContainerRef();
-  const routeNameRef = useRef();
+  const routeNameRef = useRef<string | undefined>(undefined);
 
   return (
     <>
@@ -25,13 +25,13 @@ const App = () => {
             <NavigationContainer
               ref={navigationRef}
               onReady={() => {
-                routeNameRef.current = navigationRef.getCurrentRoute().name;
+                routeNameRef.current = navigationRef.getCurrentRoute()?.name;
               }}
               onStateChange={async () => {
                 const previousRouteName = routeNameRef.current;
-                const currentRouteName = navigationRef.getCurrentRoute().name;
+                const currentRouteName = navigationRef.getCurrentRoute()?.name;
 
-                const trackScreenView = () => {
+                const trackScreenView = (_screenName?: string) => {
                   // Your implementation of analytics goes here!
                 };
 

@@ -24,9 +24,21 @@ import { ProfileSection } from '../../components/sections';
 import useAuthFirebase from '../../hooks/use-auth-firebase';
 import FastImage from '@d11/react-native-fast-image';
 import useStoreFirebase from '../../hooks/use-store-firebase';
-import { getAuthErrorMessage } from '../../utils/firebase-error';
+import { getAuthErrorMessage, getErrorCode } from '../../utils/firebase-error';
+import type { CompositeScreenProps } from '@react-navigation/native';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type {
+  StackNavigationProp,
+  StackScreenProps,
+} from '@react-navigation/stack';
+import type { RootStackParamList, TabParamList } from '../../navigations/types';
 
-export default function ProfileScreen({ navigation }) {
+type Props = CompositeScreenProps<
+  BottomTabScreenProps<TabParamList, 'ProfileScreen'>,
+  StackScreenProps<RootStackParamList>
+>;
+
+export default function ProfileScreen({ navigation }: Props) {
   const [visibleModal, setVisibleModal] = useState(false);
   const [visibleModalDelete, setVisibleModalDelete] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
@@ -53,7 +65,9 @@ export default function ProfileScreen({ navigation }) {
     setVisibleModalDelete(false);
     setLoading(false);
     setUser({});
-    navigation.reset({
+    // The tab navigator cannot reset to OnboardingScreen, so reset the root
+    // stack that owns it (where the action would bubble up to anyway).
+    navigation.getParent<StackNavigationProp<RootStackParamList>>().reset({
       index: 0,
       routes: [{ name: 'OnboardingScreen' }],
     });
@@ -105,7 +119,7 @@ export default function ProfileScreen({ navigation }) {
       await deleteAccount(user);
     } catch (error) {
       setDeleteError(
-        error?.code
+        getErrorCode(error)
           ? getAuthErrorMessage(error)
           : 'Failed to delete your account. Please try again.',
       );

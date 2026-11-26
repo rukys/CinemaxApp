@@ -3,8 +3,12 @@ import React from 'react';
 import tw from '../../../tailwind';
 import { Header } from '../../components/commons';
 import { IconApp } from '../../assets';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../../navigations/types';
 
-export default function AboutScreen({ navigation }) {
+type Props = StackScreenProps<RootStackParamList, 'AboutScreen'>;
+
+export default function AboutScreen({ navigation }: Props) {
   return (
     <>
       <View style={tw.style('flex-1 bg-primaryDark')}>

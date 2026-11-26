@@ -10,6 +10,8 @@ import {
   Dimensions,
   Pressable,
   Share,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import ImageView from 'react-native-image-viewing';
@@ -30,10 +32,19 @@ import {
 import { userStore } from '../../stores';
 import { Calendar, Heart, Share2, Star } from 'lucide-react-native';
 import useMovieVideos from '../../hooks/use-movie-videos';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../../navigations/types';
+import type {
+  CastMember,
+  CrewMember,
+  Movie,
+  VideoThumbnail,
+} from '../../types/tmdb';
+import type { FavoriteMovie } from '../../types/user';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
-const formatDateWithPrefix = (dateString, prefix = '') => {
+const formatDateWithPrefix = (dateString?: string, prefix = '') => {
   if (!dateString) {
     return '';
   }
@@ -51,21 +62,31 @@ const formatDateWithPrefix = (dateString, prefix = '') => {
     });
 
     return `${prefix} ${formattedDate}`;
-  } catch (error) {
+  } catch {
     // console.error('Date formatting error:', error);
     return '';
   }
 };
 
-export default function MovieDetailScreen({ navigation, route }) {
-  const { movieData = {} } = route.params || {};
+type Props = StackScreenProps<RootStackParamList, 'MovieDetailScreen'>;
+
+export default function MovieDetailScreen({ navigation, route }: Props) {
+  // A TMDB `Movie`, or a stored `FavoriteMovie` when opened from Favorite.
+  const movieData: Movie | FavoriteMovie | undefined = route.params?.movieData;
+  // TMDB items carry `genre_ids`; favorites store `genres` as a JSON string.
+  const movieGenreIds =
+    movieData && 'genre_ids' in movieData ? movieData.genre_ids : undefined;
+  const storedGenres =
+    movieData && 'genres' in movieData ? movieData.genres : undefined;
 
   const [isAtTop, setIsAtTop] = useState(true);
 
   const [visiblePoster, setVisiblePoster] = useState(false);
   const [visibleModal, setVisibleModal] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [valCastCrew, setValCastCrew] = useState({});
+  const [valCastCrew, setValCastCrew] = useState<
+    Partial<CastMember & CrewMember>
+  >({});
 
   const getUser = userStore(state => state.user);
   const [isLoading, setIsLoading] = useState(false);
@@ -94,12 +115,12 @@ export default function MovieDetailScreen({ navigation, route }) {
     refetch: onRefetchMovieGenre,
   } = useMovieGenre();
   const valGenre = useMemo(() => {
-    if (movieData?.genre_ids) {
-      return movieData.genre_ids;
+    if (movieGenreIds) {
+      return movieGenreIds;
     }
 
-    return safeParseArray(movieData?.genres);
-  }, [movieData?.genre_ids, movieData?.genres]);
+    return safeParseArray(storedGenres);
+  }, [movieGenreIds, storedGenres]);
   const genreNames = useMemo(
     () => getGenreNames(valGenre),
     [getGenreNames, valGenre],
@@ -116,6 +137,8 @@ export default function MovieDetailScreen({ navigation, route }) {
 
   const onSaveFavorite = useCallback(async () => {
     const genreMovie = resultMovieDetail?.genres?.map(item => item.id) || [];
+    // Fields are only undefined if pressed before the detail has loaded;
+    // that case is saved as-is, like before the TypeScript migration.
     const storeFavMovie = {
       id: String(resultMovieDetail?.id),
       title: resultMovieDetail?.title,
@@ -123,21 +146,26 @@ export default function MovieDetailScreen({ navigation, route }) {
       releaseDate: resultMovieDetail?.release_date,
       rated: String(resultMovieDetail?.vote_average),
       genres: JSON.stringify(genreMovie),
-    };
+    } as FavoriteMovie;
 
     try {
-      await saveFavoriteMovie(storeFavMovie, getUser?.id);
+      // A missing user id makes Firestore throw, handled by the catch.
+      await saveFavoriteMovie(storeFavMovie, getUser?.id as string);
       setIsFavorite(true);
-    } catch (error) {
+    } catch {
       // console.error('Failed to save favorite:', error);
     }
   }, [resultMovieDetail, getUser?.id, saveFavoriteMovie]);
 
   const onDeleteFavorite = useCallback(async () => {
     try {
-      await deleteFavoriteMovie(String(resultMovieDetail?.id), getUser?.id);
+      // A missing user id makes Firestore throw, handled by the catch.
+      await deleteFavoriteMovie(
+        String(resultMovieDetail?.id),
+        getUser?.id as string,
+      );
       setIsFavorite(false);
-    } catch (error) {
+    } catch {
       // console.error('Failed to delete favorite:', error);
     }
   }, [resultMovieDetail?.id, getUser?.id, deleteFavoriteMovie]);
@@ -153,7 +181,7 @@ export default function MovieDetailScreen({ navigation, route }) {
         getUser.id,
       );
       setIsFavorite(!!res);
-    } catch (error) {
+    } catch {
       // console.error('Failed to check favorite status:', error);
       setIsFavorite(false);
     }
@@ -171,18 +199,18 @@ export default function MovieDetailScreen({ navigation, route }) {
         title,
         message: title ? `${title}\n${url}` : url,
       });
-    } catch (error) {
+    } catch {
       // The user dismissed the share sheet or sharing is unavailable.
     }
   }, [resultMovieDetail?.id, resultMovieDetail?.title, movieData]);
 
-  const onPressCastCrew = useCallback(item => {
+  const onPressCastCrew = useCallback((item: CastMember | CrewMember) => {
     setValCastCrew(item);
     setVisibleModal(true);
   }, []);
 
   const onPressThumbnail = useCallback(
-    item => {
+    (item: VideoThumbnail) => {
       navigation.navigate('WebViewScreen', { url: item?.videoUrl || '' });
     },
     [navigation],
@@ -204,23 +232,26 @@ export default function MovieDetailScreen({ navigation, route }) {
   }, [navigation, resultMovieDetailSimilar]);
 
   const onNavigateToMovieDetail = useCallback(
-    item => {
+    (item: Movie) => {
       navigation.navigate('MovieDetailScreen', { movieData: item });
     },
     [navigation],
   );
 
-  const onScroll = useCallback(event => {
-    const offsetY = event.nativeEvent.contentOffset.y;
-    const shouldBeAtTop = offsetY <= 0;
+  const onScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const offsetY = event.nativeEvent.contentOffset.y;
+      const shouldBeAtTop = offsetY <= 0;
 
-    setIsAtTop(prev => {
-      if (prev !== shouldBeAtTop) {
-        return shouldBeAtTop;
-      }
-      return prev;
-    });
-  }, []);
+      setIsAtTop(prev => {
+        if (prev !== shouldBeAtTop) {
+          return shouldBeAtTop;
+        }
+        return prev;
+      });
+    },
+    [],
+  );
 
   const isLoadingRefreshScreen = useMemo(() => {
     return (
@@ -239,7 +270,7 @@ export default function MovieDetailScreen({ navigation, route }) {
   const onRefreshScreen = useCallback(async () => {
     setIsLoading(true);
 
-    const minDelay = new Promise(resolve => setTimeout(resolve, 1000));
+    const minDelay = new Promise<void>(resolve => setTimeout(resolve, 1000));
 
     try {
       await Promise.all([
@@ -251,11 +282,7 @@ export default function MovieDetailScreen({ navigation, route }) {
     } finally {
       setIsLoading(false);
     }
-  }, [
-    onRefetchMovieDetail,
-    onRefetchMovieGenre,
-    onRefetchMovieVideos,
-  ]);
+  }, [onRefetchMovieDetail, onRefetchMovieGenre, onRefetchMovieVideos]);
 
   useFocusEffect(
     useCallback(() => {
@@ -281,7 +308,8 @@ export default function MovieDetailScreen({ navigation, route }) {
           }}
         />
         <LinearGradient
-          colors={['transparent', tw.color('primaryDark')]}
+          // primaryDark is defined in tailwind.config, so it is never undefined.
+          colors={['transparent', tw.color('primaryDark') as string]}
           style={{
             position: 'absolute',
             top: screenHeight * 0.68 - screenHeight * 0.3,
@@ -472,9 +500,7 @@ export default function MovieDetailScreen({ navigation, route }) {
         onRequestClose={() => setVisiblePoster(false)}
       />
 
-      <AppModal
-        isVisible={visibleModal}
-        onBackdropPress={handleModalClose}>
+      <AppModal isVisible={visibleModal} onBackdropPress={handleModalClose}>
         <View style={tw.style('bg-primarySoft rounded-lg')}>
           <FastImage
             source={{ uri: ImageBackdrop(valCastCrew?.profile_path) }}

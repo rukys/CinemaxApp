@@ -2,8 +2,12 @@ import { View, Text, ScrollView } from 'react-native';
 import React from 'react';
 import tw from '../../../tailwind';
 import { Header } from '../../components/commons';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../../navigations/types';
 
-export default function PrivacyPolicyScreen({ navigation }) {
+type Props = StackScreenProps<RootStackParamList, 'PrivacyPolicyScreen'>;
+
+export default function PrivacyPolicyScreen({ navigation }: Props) {
   return (
     <>
       <View style={tw.style('flex-1 bg-primaryDark')}>
