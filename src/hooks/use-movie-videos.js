@@ -1,16 +1,14 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getMovieDetailVideos } from '../services/root-api';
 
 export default function useMovieVideos(params = '') {
-  const queryMovieVideos = useQuery(
-    ['get-movie-videos', { movie_id: params }],
-    getMovieDetailVideos,
-    {
+  const queryMovieVideos = useQuery({
+    queryKey: ['get-movie-videos', { movie_id: params }],
+    queryFn: getMovieDetailVideos,
       enabled: !!params, // hanya fetch kalau params ada
       staleTime: 5 * 60 * 1000, // 5 menit
-      cacheTime: 30 * 60 * 1000, // 30 menit
-    },
-  );
+      gcTime: 30 * 60 * 1000, // 30 menit
+  });
 
   const resultMovieVideos = queryMovieVideos?.data?.results || [];
   const isLoadingMovieVideos = queryMovieVideos.isLoading;

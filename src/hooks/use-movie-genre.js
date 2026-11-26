@@ -1,10 +1,12 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getMovieGenre } from '../services/root-api';
 
 export default function useMovieGenre() {
-  const queryMovieGenre = useQuery(['get-movie-genre'], getMovieGenre, {
+  const queryMovieGenre = useQuery({
+    queryKey: ['get-movie-genre'],
+    queryFn: getMovieGenre,
     staleTime: 5 * 60 * 1000, // 5 menit
-    cacheTime: 30 * 60 * 1000, // 30 menit
+    gcTime: 30 * 60 * 1000, // 30 menit
   });
   const resultMovieGenre = queryMovieGenre?.data?.genres || [];
 

@@ -5,7 +5,7 @@ import {
 } from '@react-navigation/native';
 import { StatusBar } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Navigations from './navigations';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import tw from '../tailwind';
@@ -44,10 +44,11 @@ const App = () => {
                   // console.log(currentRouteName);
                 }
               }}>
-              <StatusBar
-                backgroundColor={tw.color('primaryDark')}
-                barStyle="light-content"
-              />
+              {/* Edge-to-edge (Android 15+/targetSdk 36): the status bar is
+                  transparent, so its color comes from the SafeAreaView
+                  background above. Only the icon style is set here. */}
+              <StatusBar barStyle="light-content" />
+
               <Navigations />
             </NavigationContainer>
           </SafeAreaView>
