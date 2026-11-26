@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import tw from '../../../../tailwind';
 import { Eye, EyeOff } from 'lucide-react-native';
 
@@ -15,17 +14,13 @@ const Input = ({
   isEditable = true,
   ...props
 }) => {
-  const [visibleLabel, setVisibleLabel] = useState(true);
+  const [isFocused, setIsFocused] = useState(false);
   const [secureText, setSecureText] = useState(isSecureText);
-  const [valInput, setValInput] = useState('');
 
-  useEffect(() => {
-    if (!value) {
-      setVisibleLabel(true);
-    } else {
-      setVisibleLabel(false);
-    }
-  }, []);
+  // The label sits inside the field only while it is empty and unfocused.
+  // Derived from `value` on every render so values that arrive later
+  // (e.g. loaded profile data) never overlap the label.
+  const visibleLabel = !isFocused && !value;
 
   return (
     <View
@@ -45,19 +40,12 @@ const Input = ({
         value={value}
         editable={isEditable}
         onFocus={() => {
-          setVisibleLabel(false);
+          setIsFocused(true);
         }}
         onBlur={() => {
-          if (valInput !== '') {
-            setVisibleLabel(false);
-          } else {
-            setVisibleLabel(true);
-          }
+          setIsFocused(false);
         }}
-        onChangeText={val => {
-          setValInput(val);
-          onChangeText(val);
-        }}
+        onChangeText={onChangeText}
         style={tw.style(
           'flex-1 h-14 text-textWhiteGrey font-montserratMedium text-sm',
           textInputStyles,

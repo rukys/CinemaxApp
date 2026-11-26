@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback, useState, useMemo } from 'react';
 import { View, Text, FlatList } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -9,6 +8,7 @@ import useStoreFirebase from '../../hooks/use-store-firebase';
 import { userStore } from '../../stores';
 import useMovieGenre from '../../hooks/use-movie-genre';
 import { SearchSection } from '../../components/sections';
+import { safeParseArray } from '../../utils';
 
 export default function FavoriteScreen({ navigation }) {
   const [searchText, setSearchText] = useState('');
@@ -31,7 +31,7 @@ export default function FavoriteScreen({ navigation }) {
         ?.toLowerCase()
         .includes(lowercasedSearch);
 
-      const genreNames = getGenreNames(JSON.parse(item?.genres))
+      const genreNames = getGenreNames(safeParseArray(item?.genres))
         ?.join(', ')
         ?.toLowerCase();
       const genreMatch = genreNames?.includes(lowercasedSearch);
@@ -74,7 +74,7 @@ export default function FavoriteScreen({ navigation }) {
   useFocusEffect(
     useCallback(() => {
       onFetchListFavoriteMovie();
-    }, []),
+    }, [onFetchListFavoriteMovie]),
   );
 
   return (
@@ -123,7 +123,7 @@ export default function FavoriteScreen({ navigation }) {
                   title={item?.title}
                   relaseDate={item?.releaseDate}
                   rated={Number(item?.rated)}
-                  genreName={getGenreNames(JSON.parse(item?.genres))}
+                  genreName={getGenreNames(safeParseArray(item?.genres))}
                   onPressCard={() => handleMovieDetailPress(item)}
                 />
               )}

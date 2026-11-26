@@ -1,44 +1,40 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { ScrollView, View } from 'react-native';
 import React, { useCallback, useState } from 'react';
 import tw from '../../../tailwind';
 import { Button, CardCountry, Header } from '../../components/commons';
-// import { SearchSection } from '../../components/sections';
 import { useFocusEffect } from '@react-navigation/native';
 import { listCountry } from '../../constants';
 import useStoreFirebase from '../../hooks/use-store-firebase';
 import { userStore } from '../../stores';
+import { showErrorToast } from '../../utils/toast';
 
 export default function CountryScreen({ navigation, route }) {
   const { isFromSignup = false } = route.params || {};
 
+  // Selection stays local until the user presses Save.
   const [valCountry, setValCountry] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
   const getUser = userStore(state => state.user);
   const setUser = userStore(state => state.setUser);
 
   const { getUserFromFirestore, updateUserCountryCode } = useStoreFirebase();
 
+  const selectedCountry = valCountry || getUser?.countryCode || '';
+
   const onGetDataProfile = useCallback(() => {
-    getUserFromFirestore(getUser?.id)
+    if (!getUser?.id) {
+      return;
+    }
+    getUserFromFirestore(getUser.id)
       .then(res => {
         if (res) {
           setUser(res);
         }
       })
       .catch(() => {});
-  }, [getUser?.id, getUserFromFirestore]);
+  }, [getUser?.id, getUserFromFirestore, setUser]);
 
-  const handleUpdateCountryCode = async countryCode => {
-    setValCountry(countryCode);
-    try {
-      await updateUserCountryCode(getUser?.id, countryCode);
-      await onGetDataProfile();
-    } catch (error) {
-      // console.error('Error updating country code:', error.message);
-    }
-  };
-
-  const handleSaveChanges = () => {
+  const goNext = useCallback(() => {
     if (isFromSignup) {
       navigation.reset({
         index: 0,
@@ -47,16 +43,34 @@ export default function CountryScreen({ navigation, route }) {
     } else {
       navigation.goBack();
     }
-  };
+  }, [isFromSignup, navigation]);
 
-  const isDisabledButton = isFromSignup ? valCountry === '' : false;
+  const handleSaveChanges = useCallback(async () => {
+    const hasChanged = !!valCountry && valCountry !== getUser?.countryCode;
+    if (!hasChanged) {
+      goNext();
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await updateUserCountryCode(getUser?.id, valCountry);
+      setUser({ ...getUser, countryCode: valCountry });
+      goNext();
+    } catch (error) {
+      showErrorToast('Failed to save your country. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  }, [valCountry, getUser, updateUserCountryCode, setUser, goNext]);
+
+  const isDisabledButton =
+    isSaving || (isFromSignup ? selectedCountry === '' : false);
 
   useFocusEffect(
     useCallback(() => {
-      if (getUser?.id) {
-        onGetDataProfile();
-      }
-    }, []),
+      onGetDataProfile();
+    }, [onGetDataProfile]),
   );
 
   return (
@@ -70,28 +84,21 @@ export default function CountryScreen({ navigation, route }) {
             navigation.goBack();
           }}
         />
-        {/* <SearchSection
-          value={searchText}
-          onChangeText={onChangeSearch}
-          onCancel={() => onChangeSearch('')}
-          placeholder="Search your region"
-          styles={tw.style('mx-4 mb-5')}
-        /> */}
-
         <ScrollView>
           {listCountry.map(item => (
             <CardCountry
               key={item.id.toString()}
               nameCountry={item?.country}
               image={item?.icon}
-              isChecked={getUser?.countryCode === item?.code_iso}
-              handleCheckBox={() => handleUpdateCountryCode(item?.code_iso)}
+              isChecked={selectedCountry === item?.code_iso}
+              handleCheckBox={() => setValCountry(item?.code_iso)}
             />
           ))}
         </ScrollView>
         <View style={tw.style('mx-6 mb-4 bg-primaryDark mt-4')}>
           <Button
             textButton={isFromSignup ? 'Save Country' : 'Save Changes'}
+            isLoading={isSaving}
             isDisabled={isDisabledButton}
             onPress={handleSaveChanges}
             styles={tw.style('')}

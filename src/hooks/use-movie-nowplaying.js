@@ -1,9 +1,9 @@
 import { useQuery } from 'react-query';
 import { getMovieNowPlaying } from '../services/root-api';
+import { getLocalDateString } from '../utils';
 
 export default function useMovieNowplaying(params = '') {
-  // const today = new Date('2025-06-11').toISOString().split('T')[0];
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDateString();
 
   const queryMovieNowplaying = useQuery(
     ['get-movie-nowplaying', { countryCode: params }],

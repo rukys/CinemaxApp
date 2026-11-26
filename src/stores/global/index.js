@@ -11,11 +11,6 @@ const globalStore = create(set => ({
     set({ errorServer });
   },
 
-  loading: false,
-  setLoading: loading => {
-    set({ loading });
-  },
-
   isNetworkError: false,
   setIsNetworkError: isNetworkError => {
     set({ isNetworkError });

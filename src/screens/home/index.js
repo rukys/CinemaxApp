@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useMemo, useCallback } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 import tw from '../../../tailwind';
@@ -10,7 +9,7 @@ import {
   SearchSection,
 } from '../../components/sections';
 import useMovieUpcoming from '../../hooks/use-movie-upcoming';
-import { globalStore, userStore } from '../../stores';
+import { userStore } from '../../stores';
 import useMovieGenre from '../../hooks/use-movie-genre';
 import useMoviePopular from '../../hooks/use-movie-popular';
 import useMovieNowplaying from '../../hooks/use-movie-nowplaying';
@@ -19,8 +18,7 @@ export default function HomeScreen({ navigation }) {
   const [category, setCategory] = useState('All');
 
   const getUser = userStore(state => state.user);
-  const isLoading = globalStore(state => state.loading);
-  const setIsLoading = globalStore(state => state.setLoading);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     resultMovieUpcoming,

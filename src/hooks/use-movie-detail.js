@@ -3,7 +3,6 @@ import {
   getMovieDetail,
   getMovieDetailCredits,
   getMovieDetailSimilar,
-  getMovieDetailVideos,
 } from '../services/root-api';
 
 export default function useMovieDetail(params = '') {
@@ -37,20 +36,7 @@ export default function useMovieDetail(params = '') {
     return queryMovieDetailCredits.refetch();
   };
 
-  const queryMovieDetailVideos = useQuery(
-    ['get-movie-detail-videos', { movie_id: params }],
-    getMovieDetailVideos,
-    {
-      enabled: !!params,
-      staleTime: 5 * 60 * 1000, // 5 menit
-      cacheTime: 30 * 60 * 1000, // 30 menit
-    },
-  );
-  const resultMovieDetailVideos = queryMovieDetailVideos?.data?.results || [];
-  const isLoadingMovieDetailVideos = queryMovieDetailVideos.isLoading;
-  const onRefetchMovieDetailVideos = () => {
-    return queryMovieDetailVideos.refetch();
-  };
+  // Videos are fetched by `use-movie-videos` to avoid a duplicate request.
 
   const queryMovieDetailSimilar = useQuery(
     ['get-movie-detail-similar', { movie_id: params }],
@@ -75,10 +61,6 @@ export default function useMovieDetail(params = '') {
     resultMovieDetailCredits,
     isLoadingMovieDetailCredits,
     onRefetchMovieDetailCredits,
-
-    resultMovieDetailVideos,
-    isLoadingMovieDetailVideos,
-    onRefetchMovieDetailVideos,
 
     resultMovieDetailSimilar,
     isLoadingMovieDetailSimilar,

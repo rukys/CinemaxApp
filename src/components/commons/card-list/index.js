@@ -36,7 +36,7 @@ const CardList = ({
         />
       )}
       <View style={tw.style('flex-1 ml-4')}>
-        {rated !== 0 && (
+        {Number(rated) > 0 && (
           <View
             style={tw.style(
               'flex-row items-center w-16 p-2 rounded-lg bg-primarySoft',

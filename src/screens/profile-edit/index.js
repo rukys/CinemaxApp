@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback, useState, useMemo } from 'react';
 import { ScrollView, View, TouchableOpacity, Text } from 'react-native';
 import Modal from 'react-native-modal';
@@ -6,10 +5,11 @@ import tw from '../../../tailwind';
 import { Button, Header, Input } from '../../components/commons';
 import FastImage from 'react-native-fast-image';
 import { ImgProfile, ImgSuccess } from '../../assets';
-import { globalStore, userStore } from '../../stores';
+import { userStore } from '../../stores';
 import useStoreFirebase from '../../hooks/use-store-firebase';
 import { useFocusEffect } from '@react-navigation/native';
 import { Camera } from 'lucide-react-native';
+import { showErrorToast } from '../../utils/toast';
 
 export default function ProfileEditScreen({ navigation }) {
   const [valPhoneNumber, setValPhoneNumber] = useState('');
@@ -17,21 +17,25 @@ export default function ProfileEditScreen({ navigation }) {
 
   const getUser = userStore(state => state.user);
   const setUser = userStore(state => state.setUser);
-  const isLoading = globalStore(state => state.loading);
-  const setIsLoading = globalStore(state => state.setLoading);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { updateUserToFirestore, getUserFromFirestore } = useStoreFirebase();
 
-  const isEditablePhoneNumber = useMemo(() => {
-    return (
-      getUser?.phoneNumber === null ||
-      getUser?.phoneNumber === '' ||
-      getUser?.phoneNumber === 'null'
-    );
+  // Older profiles may contain the string 'null' instead of a real null.
+  const savedPhoneNumber = useMemo(() => {
+    const phone = getUser?.phoneNumber;
+    return phone && phone !== 'null' ? String(phone) : '';
   }, [getUser?.phoneNumber]);
 
+  // The phone number can only be set once, while it is still empty.
+  const isEditablePhoneNumber = savedPhoneNumber === '';
+  const trimmedPhoneNumber = valPhoneNumber.trim();
+
   const onGetDataProfile = useCallback(() => {
-    getUserFromFirestore(getUser?.id)
+    if (!getUser?.id) {
+      return;
+    }
+    getUserFromFirestore(getUser.id)
       .then(res => {
         if (res) {
           setUser(res);
@@ -40,23 +44,26 @@ export default function ProfileEditScreen({ navigation }) {
       .catch(() => {});
   }, [getUser?.id, getUserFromFirestore, setUser]);
 
-  const onUpdateDataProfile = useCallback(() => {
-    setIsLoading(true);
-    const updateStore = {
-      ...getUser,
-      phoneNumber: valPhoneNumber,
-    };
+  const onUpdateDataProfile = useCallback(async () => {
+    if (!trimmedPhoneNumber) {
+      showErrorToast('Please enter your phone number.');
+      return;
+    }
 
-    updateUserToFirestore(updateStore)
-      .then(() => {
-        onGetDataProfile();
-        setIsLoading(false);
-        setVisibleModal(true);
-      })
-      .catch(() => {
-        setIsLoading(false);
+    setIsLoading(true);
+    try {
+      await updateUserToFirestore({
+        id: getUser?.id,
+        phoneNumber: trimmedPhoneNumber,
       });
-  }, [getUser, valPhoneNumber, updateUserToFirestore, onGetDataProfile]);
+      onGetDataProfile();
+      setVisibleModal(true);
+    } catch (error) {
+      showErrorToast('Failed to update your profile. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [getUser?.id, trimmedPhoneNumber, updateUserToFirestore, onGetDataProfile]);
 
   const handlePhoneNumberChange = useCallback(text => {
     setValPhoneNumber(text);
@@ -73,7 +80,7 @@ export default function ProfileEditScreen({ navigation }) {
   useFocusEffect(
     useCallback(() => {
       onGetDataProfile();
-    }, []),
+    }, [onGetDataProfile]),
   );
 
   return (
@@ -129,7 +136,7 @@ export default function ProfileEditScreen({ navigation }) {
             />
             <Input
               label="Phone Number"
-              value={getUser?.phoneNumber || valPhoneNumber}
+              value={savedPhoneNumber || valPhoneNumber}
               onChangeText={handlePhoneNumberChange}
               styles={tw.style('mx-6 mb-6')}
               isEditable={isEditablePhoneNumber}
@@ -142,7 +149,9 @@ export default function ProfileEditScreen({ navigation }) {
             textButton="Save Changes"
             styles={tw.style('')}
             isLoading={isLoading}
-            isDisabled={!isEditablePhoneNumber}
+            isDisabled={
+              !isEditablePhoneNumber || trimmedPhoneNumber === '' || isLoading
+            }
             onPress={onUpdateDataProfile}
           />
         </View>

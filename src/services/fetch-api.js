@@ -33,10 +33,10 @@ export const fetchApi = async ({
     ...rest,
   });
 
-  console.log(
-    `%c[${response.status}][${method}] ${url || `${path}`}`,
-    response.data,
-  );
+  if (__DEV__) {
+    // eslint-disable-next-line no-console
+    console.log(`[${response.status}][${method}] ${url || `${path}`}`, params);
+  }
 
   return response.data;
 };
