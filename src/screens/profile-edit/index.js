@@ -3,7 +3,7 @@ import { ScrollView, View, TouchableOpacity, Text } from 'react-native';
 import Modal from 'react-native-modal';
 import tw from '../../../tailwind';
 import { Button, Header, Input } from '../../components/commons';
-import FastImage from 'react-native-fast-image';
+import FastImage from '@d11/react-native-fast-image';
 import { ImgProfile, ImgSuccess } from '../../assets';
 import { userStore } from '../../stores';
 import useStoreFirebase from '../../hooks/use-store-firebase';

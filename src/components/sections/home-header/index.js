@@ -4,7 +4,7 @@ import tw from '../../../../tailwind';
 import { Gap } from '../../commons';
 import { useNavigation } from '@react-navigation/native';
 import { ImgProfile } from '../../../assets';
-import FastImage from 'react-native-fast-image';
+import FastImage from '@d11/react-native-fast-image';
 
 const HomeHeaderSection = ({ data = {} }) => {
   const navigation = useNavigation();

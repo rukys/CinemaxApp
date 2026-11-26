@@ -10,6 +10,7 @@ import CardList from './card-list';
 import CastCrewItem from './cast-crew-item';
 import CardCountry from './card-country';
 import ThumbnailItem from './thumbnail-item';
+import Checkbox from './checkbox';
 
 export {
   Gap,
@@ -24,4 +25,5 @@ export {
   CastCrewItem,
   CardCountry,
   ThumbnailItem,
+  Checkbox,
 };

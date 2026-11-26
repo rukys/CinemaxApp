@@ -1,8 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { View, Text, ScrollView } from 'react-native';
-import CheckBox from '@react-native-community/checkbox';
 import tw from '../../../tailwind';
-import { Button, Header, Input } from '../../components/commons';
+import { Button, Checkbox, Header, Input } from '../../components/commons';
 import useAuthFirebase from '../../hooks/use-auth-firebase';
 import { userStore } from '../../stores';
 import useStoreFirebase from '../../hooks/use-store-firebase';
@@ -16,7 +15,7 @@ import { showErrorToast } from '../../utils/toast';
 export default function SignupScreen({ navigation }) {
   const setUser = userStore(state => state.setUser);
 
-  const { registerWithEmail } = useAuthFirebase();
+  const { registerWithEmail, deleteAccount } = useAuthFirebase();
   const { saveUserToFirestore } = useStoreFirebase();
 
   const [email, setEmail] = useState('');
@@ -91,7 +90,7 @@ export default function SignupScreen({ navigation }) {
       // Roll back the new auth account so the user can sign up again with
       // the same email instead of being stuck without a profile.
       try {
-        await user.delete();
+        await deleteAccount(user);
       } catch (rollbackError) {
         // Ignore: nothing else we can do on the client.
       }
@@ -101,6 +100,7 @@ export default function SignupScreen({ navigation }) {
     }
   }, [
     email,
+    deleteAccount,
     password,
     fullName,
     registerWithEmail,
@@ -163,13 +163,10 @@ export default function SignupScreen({ navigation }) {
               onChangeText={handlePasswordChange}
             />
             <View style={tw.style('flex-row mt-2')}>
-              <CheckBox
+              <Checkbox
                 value={isCheckBox}
                 onValueChange={handleCheckboxChange}
-                style={tw.style('mr-4')}
-                tintColors={tw.color('textGrey')}
-                onTintColor={tw.color('primaryBlueAccent')}
-                onCheckColor={tw.color('primaryBlueAccent')}
+                styles={tw.style('mr-4 mt-0.5')}
               />
               <Text
                 style={tw.style(

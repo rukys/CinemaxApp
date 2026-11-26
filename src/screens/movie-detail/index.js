@@ -14,7 +14,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import ImageView from 'react-native-image-viewing';
 import LinearGradient from 'react-native-linear-gradient';
-import FastImage from 'react-native-fast-image';
+import FastImage from '@d11/react-native-fast-image';
 import tw from '../../../tailwind';
 import { Button, Header } from '../../components/commons';
 import { ImageBackdrop, ImagePoster } from '../../constants';
