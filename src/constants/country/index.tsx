@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react';
 import {
   IconFlagAmerica,
   IconFlagBrazil,
@@ -11,7 +12,15 @@ import {
   IconFlagUK,
 } from '../../assets';
 
-export const listCountry = [
+export interface Country {
+  id: number;
+  country: string;
+  icon: ReactElement;
+  /** ISO 3166-1 alpha-2 code, used as the TMDB region. */
+  code_iso: string;
+}
+
+export const listCountry: Country[] = [
   {
     id: 1,
     country: 'United States America',

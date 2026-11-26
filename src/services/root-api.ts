@@ -1,80 +1,60 @@
 import { fetchApi } from './fetch-api';
 import { API_HOST } from '../config';
+import type {
+  CreditsResponse,
+  GenreListResponse,
+  Movie,
+  MovieDetail,
+  PaginatedResponse,
+  VideosResponse,
+} from '../types/tmdb';
 
 const DEFAULT_LANGUAGE = 'en-US';
 
+type QueryParams = Record<string, string | number>;
+
 // Query strings are passed through axios `params` so every value is
 // URL-encoded (e.g. a search keyword containing "&" or "#").
-const get = (path, params = {}) =>
-  fetchApi({
+const get = <T>(path: string, params: QueryParams = {}) =>
+  fetchApi<T>({
     url: `${API_HOST}${path}`,
     params: { language: DEFAULT_LANGUAGE, ...params },
   });
 
 // TMDB rejects an empty `region`, so only send it when it is set.
-const withRegion = (countryCode, params = {}) =>
+const withRegion = (countryCode = '', params: QueryParams = {}) =>
   countryCode ? { ...params, region: countryCode } : params;
 
-// -- function get configuration --
-export const getConfigLanguages = () => {
-  return fetchApi({ url: `${API_HOST}configuration/languages` });
-};
+/** Movie list categories and their TMDB endpoints. */
+export const MOVIE_LIST_PATHS = {
+  trending: 'trending/movie/day',
+  now_playing: 'movie/now_playing',
+  popular: 'movie/popular',
+  top_rated: 'movie/top_rated',
+  upcoming: 'movie/upcoming',
+} as const;
 
-export const getConfigCountries = () => {
-  return get('configuration/countries');
-};
+export type MovieListCategory = keyof typeof MOVIE_LIST_PATHS;
 
-// -- function get movie --
-export const getMovieTrending = ({ queryKey }) => {
-  const [, { countryCode }] = queryKey;
-  return get('trending/movie/day', withRegion(countryCode, { page: 1 }));
-};
+export const getMovieList = (category: MovieListCategory, countryCode = '') =>
+  get<PaginatedResponse<Movie>>(
+    MOVIE_LIST_PATHS[category],
+    withRegion(countryCode, { page: 1 }),
+  );
 
-export const getMovieGenre = () => {
-  return get('genre/movie/list');
-};
+export const getMovieGenre = () => get<GenreListResponse>('genre/movie/list');
 
-export const getMovieNowPlaying = ({ queryKey }) => {
-  const [, { countryCode }] = queryKey;
-  return get('movie/now_playing', withRegion(countryCode, { page: 1 }));
-};
+export const getMovieSearch = (keyword: string) =>
+  get<PaginatedResponse<Movie>>('search/movie', { query: keyword, page: 1 });
 
-export const getMoviePopular = ({ queryKey }) => {
-  const [, { countryCode }] = queryKey;
-  return get('movie/popular', withRegion(countryCode, { page: 1 }));
-};
+export const getMovieDetail = (movieId: number | string) =>
+  get<MovieDetail>(`movie/${movieId}`);
 
-export const getMovieTopRated = ({ queryKey }) => {
-  const [, { countryCode }] = queryKey;
-  return get('movie/top_rated', withRegion(countryCode, { page: 1 }));
-};
+export const getMovieDetailCredits = (movieId: number | string) =>
+  get<CreditsResponse>(`movie/${movieId}/credits`);
 
-export const getMovieUpcoming = ({ queryKey }) => {
-  const [, { countryCode }] = queryKey;
-  return get('movie/upcoming', withRegion(countryCode, { page: 1 }));
-};
+export const getMovieDetailVideos = (movieId: number | string) =>
+  get<VideosResponse>(`movie/${movieId}/videos`);
 
-export const getMovieSearch = ({ queryKey }) => {
-  const [, { keyword }] = queryKey;
-  return get('search/movie', { query: keyword, page: 1 });
-};
-
-export const getMovieDetail = ({ queryKey }) => {
-  const [, { movie_id }] = queryKey;
-  return get(`movie/${movie_id}`);
-};
-
-export const getMovieDetailCredits = ({ queryKey }) => {
-  const [, { movie_id }] = queryKey;
-  return get(`movie/${movie_id}/credits`);
-};
-
-export const getMovieDetailVideos = ({ queryKey }) => {
-  const [, { movie_id }] = queryKey;
-  return get(`movie/${movie_id}/videos`);
-};
-
-export const getMovieDetailSimilar = ({ queryKey }) => {
-  const [, { movie_id }] = queryKey;
-  return get(`movie/${movie_id}/similar`);
-};
+export const getMovieDetailSimilar = (movieId: number | string) =>
+  get<PaginatedResponse<Movie>>(`movie/${movieId}/similar`);

@@ -1,41 +1,34 @@
-import axios from 'axios';
+import axios, { type AxiosRequestConfig, type Method } from 'axios';
 import { ACCESS_TOKEN, API_TIMEOUT } from '../config';
 
-export const fetchApi = async ({
+export interface FetchApiOptions
+  extends Omit<AxiosRequestConfig, 'url' | 'method' | 'headers'> {
+  url: string;
+  method?: Method;
+}
+
+export const fetchApi = async <T>({
   url,
-  path,
   method = 'GET',
-  data,
   params,
-  headers,
-  isExternalResource,
   ...rest
-}) => {
-  const finalHeaders = {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-    Authorization: 'Bearer ' + ACCESS_TOKEN,
-  };
-
-  // console.info(`%c[${method}]%c ${url || `${path}`}`, {
-  //   params,
-  //   data,
-  //   headers: finalHeaders,
-  // });
-
-  const response = await axios({
+}: FetchApiOptions): Promise<T> => {
+  const response = await axios.request<T>({
     timeout: API_TIMEOUT,
-    url: url || path,
+    url,
     method,
-    data,
     params,
-    headers: finalHeaders,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${ACCESS_TOKEN}`,
+    },
     ...rest,
   });
 
   if (__DEV__) {
     // eslint-disable-next-line no-console
-    console.log(`[${response.status}][${method}] ${url || `${path}`}`, params);
+    console.log(`[${response.status}][${method}] ${url}`, params);
   }
 
   return response.data;
