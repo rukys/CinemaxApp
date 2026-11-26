@@ -18,7 +18,7 @@ import { Button, Gap } from '../../components/commons';
 export default function OnboardingScreen({ navigation }) {
   return (
     <>
-      <StatusBar backgroundColor={tw.color('primaryDark')} />
+      <StatusBar barStyle="light-content" />
       <ScrollView style={tw.style('flex-1 bg-primaryDark')}>
         <View style={tw.style('items-center mx-6')}>
           <Gap height={116} />
