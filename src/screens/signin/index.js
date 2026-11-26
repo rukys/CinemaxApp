@@ -9,14 +9,15 @@ import {
 } from '../../assets';
 import { Button, Header, Input } from '../../components/commons';
 import useAuthFirebase from '../../hooks/use-auth-firebase';
-import { globalStore, userStore } from '../../stores';
+import { userStore } from '../../stores';
 import useStoreFirebase from '../../hooks/use-store-firebase';
+import { getAuthErrorMessage, isValidEmail } from '../../utils/firebase-error';
+import { showErrorToast } from '../../utils/toast';
 
 export default function SigninScreen({ navigation }) {
   const setUser = userStore(state => state.setUser);
-  const setLoading = globalStore(state => state.setLoading);
-  const loading = globalStore(state => state.loading);
 
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -39,33 +40,32 @@ export default function SigninScreen({ navigation }) {
     navigation.navigate('ForgotPassScreen');
   }, [navigation]);
 
-  const handlePressSignin = useCallback(() => {
+  const handlePressSignin = useCallback(async () => {
+    const trimmedEmail = email.trim();
+    if (!isValidEmail(trimmedEmail)) {
+      showErrorToast(getAuthErrorMessage('auth/invalid-email'));
+      return;
+    }
+
     setLoading(true);
-    loginWithEmail(email, password)
-      .then(response => {
-        if (response?._user) {
-          setLoading(false);
-          getUserFromFirestore(response?.uid).then(snapshot => {
-            setUser(snapshot);
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'AppBarScreen' }],
-            });
-          });
-        }
-      })
-      .catch(() => {
-        setLoading(false);
+    try {
+      const user = await loginWithEmail(trimmedEmail, password);
+      const snapshot = await getUserFromFirestore(user.uid);
+      setUser(snapshot);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'AppBarScreen' }],
       });
-  }, [
-    email,
-    password,
-    loginWithEmail,
-    getUserFromFirestore,
-    setUser,
-    setLoading,
-    navigation,
-  ]);
+    } catch (error) {
+      showErrorToast(
+        error?.code
+          ? getAuthErrorMessage(error)
+          : 'Failed to load your profile. Please try again.',
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [email, password, loginWithEmail, getUserFromFirestore, setUser, navigation]);
 
   const isDisabledButton = useMemo(() => {
     return email === '' || password === '';

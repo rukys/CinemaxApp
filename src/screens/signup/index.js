@@ -4,8 +4,14 @@ import CheckBox from '@react-native-community/checkbox';
 import tw from '../../../tailwind';
 import { Button, Header, Input } from '../../components/commons';
 import useAuthFirebase from '../../hooks/use-auth-firebase';
-import { globalStore, userStore } from '../../stores';
+import { userStore } from '../../stores';
 import useStoreFirebase from '../../hooks/use-store-firebase';
+import {
+  getAuthErrorMessage,
+  isValidEmail,
+  MIN_PASSWORD_LENGTH,
+} from '../../utils/firebase-error';
+import { showErrorToast } from '../../utils/toast';
 
 export default function SignupScreen({ navigation }) {
   const setUser = userStore(state => state.setUser);
@@ -18,8 +24,7 @@ export default function SignupScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [isCheckBox, setIsCheckBox] = useState(false);
 
-  const isLoading = globalStore(state => state.loading);
-  const setIsLoading = globalStore(state => state.setLoading);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleFullNameChange = useCallback(value => {
     setFullName(value);
@@ -41,24 +46,59 @@ export default function SignupScreen({ navigation }) {
     navigation.goBack();
   }, [navigation]);
 
-  const handlePressSignup = useCallback(() => {
-    setIsLoading(true);
-    registerWithEmail(email, password, fullName).then(response => {
-      if (response?._user) {
-        setIsLoading(false);
-        const storeSignup = {
-          id: response?.uid,
-          fullName: fullName,
-          email: response?.email,
-          photo: response?.photoURL,
-          phoneNumber: response?.phoneNumber,
-        };
+  const handlePressSignup = useCallback(async () => {
+    const trimmedEmail = email.trim();
+    const trimmedName = fullName.trim();
 
-        setUser(storeSignup);
-        saveUserToFirestore(storeSignup);
-        navigation.replace('CountryScreen', { isFromSignup: true });
+    if (!trimmedName) {
+      showErrorToast('Please enter your full name.');
+      return;
+    }
+    if (!isValidEmail(trimmedEmail)) {
+      showErrorToast(getAuthErrorMessage('auth/invalid-email'));
+      return;
+    }
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      showErrorToast(getAuthErrorMessage('auth/weak-password'));
+      return;
+    }
+
+    setIsLoading(true);
+    let user = null;
+    try {
+      user = await registerWithEmail(trimmedEmail, password);
+    } catch (error) {
+      showErrorToast(getAuthErrorMessage(error));
+      setIsLoading(false);
+      return;
+    }
+
+    const storeSignup = {
+      id: user.uid,
+      fullName: trimmedName,
+      email: user.email,
+      photo: user.photoURL ?? null,
+      phoneNumber: user.phoneNumber ?? null,
+    };
+
+    try {
+      // Save the profile before navigating so the user never lands in the
+      // app without a Firestore document.
+      await saveUserToFirestore(storeSignup);
+      setUser(storeSignup);
+      navigation.replace('CountryScreen', { isFromSignup: true });
+    } catch (error) {
+      // Roll back the new auth account so the user can sign up again with
+      // the same email instead of being stuck without a profile.
+      try {
+        await user.delete();
+      } catch (rollbackError) {
+        // Ignore: nothing else we can do on the client.
       }
-    });
+      showErrorToast('Failed to save your profile. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   }, [
     email,
     password,
@@ -66,7 +106,6 @@ export default function SignupScreen({ navigation }) {
     registerWithEmail,
     setUser,
     saveUserToFirestore,
-    setIsLoading,
     navigation,
   ]);
 
