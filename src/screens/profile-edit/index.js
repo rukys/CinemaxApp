@@ -1,8 +1,7 @@
 import React, { useCallback, useState, useMemo } from 'react';
 import { ScrollView, View, TouchableOpacity, Text } from 'react-native';
-import Modal from 'react-native-modal';
 import tw from '../../../tailwind';
-import { Button, Header, Input } from '../../components/commons';
+import { AppModal, Button, Header, Input } from '../../components/commons';
 import FastImage from '@d11/react-native-fast-image';
 import { ImgProfile, ImgSuccess } from '../../assets';
 import { userStore } from '../../stores';
@@ -157,7 +156,7 @@ export default function ProfileEditScreen({ navigation }) {
         </View>
       </View>
 
-      <Modal isVisible={visibleModal} onBackdropPress={handleModalClose}>
+      <AppModal isVisible={visibleModal} onBackdropPress={handleModalClose}>
         <View style={tw.style('bg-primarySoft p-5 rounded-3xl')}>
           <View style={tw.style('self-center mb-2 mt-2')}>
             <ImgSuccess height={125} width={125} />
@@ -183,7 +182,7 @@ export default function ProfileEditScreen({ navigation }) {
             />
           </View>
         </View>
-      </Modal>
+      </AppModal>
     </>
   );
 }

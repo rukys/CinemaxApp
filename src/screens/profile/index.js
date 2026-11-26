@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import Modal from 'react-native-modal';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import deviceInfoModule from 'react-native-device-info';
 import tw from '../../../tailwind';
@@ -13,6 +12,7 @@ import {
   User,
 } from 'lucide-react-native';
 import {
+  AppModal,
   Button,
   Header,
   Input,
@@ -261,7 +261,7 @@ export default function ProfileScreen({ navigation }) {
         </ScrollView>
       </View>
 
-      <Modal
+      <AppModal
         isVisible={visibleModal}
         onBackdropPress={() => {
           setVisibleModal(false);
@@ -301,9 +301,9 @@ export default function ProfileScreen({ navigation }) {
             />
           </View>
         </View>
-      </Modal>
+      </AppModal>
 
-      <Modal
+      <AppModal
         isVisible={visibleModalDelete}
         avoidKeyboard
         onBackdropPress={handleCloseDeleteModal}
@@ -358,7 +358,7 @@ export default function ProfileScreen({ navigation }) {
             />
           </View>
         </View>
-      </Modal>
+      </AppModal>
     </>
   );
 }

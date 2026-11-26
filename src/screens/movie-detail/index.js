@@ -16,7 +16,7 @@ import ImageView from 'react-native-image-viewing';
 import LinearGradient from 'react-native-linear-gradient';
 import FastImage from '@d11/react-native-fast-image';
 import tw from '../../../tailwind';
-import { Button, Header } from '../../components/commons';
+import { AppModal, Button, Header } from '../../components/commons';
 import { ImageBackdrop, ImagePoster } from '../../constants';
 import { safeParseArray } from '../../utils';
 import useMovieGenre from '../../hooks/use-movie-genre';
@@ -27,7 +27,6 @@ import {
   HomeSection,
   ThumbnailSection,
 } from '../../components/sections';
-import ReactNativeModal from 'react-native-modal';
 import { userStore } from '../../stores';
 import { Calendar, Heart, Share2, Star } from 'lucide-react-native';
 import useMovieVideos from '../../hooks/use-movie-videos';
@@ -481,7 +480,7 @@ export default function MovieDetailScreen({ navigation, route }) {
         onRequestClose={() => setVisiblePoster(false)}
       />
 
-      <ReactNativeModal
+      <AppModal
         isVisible={visibleModal}
         onBackdropPress={handleModalClose}>
         <View style={tw.style('bg-primarySoft rounded-lg')}>
@@ -527,7 +526,7 @@ export default function MovieDetailScreen({ navigation, route }) {
             />
           </View>
         </View>
-      </ReactNativeModal>
+      </AppModal>
     </>
   );
 }

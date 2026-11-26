@@ -11,6 +11,7 @@ import CastCrewItem from './cast-crew-item';
 import CardCountry from './card-country';
 import ThumbnailItem from './thumbnail-item';
 import Checkbox from './checkbox';
+import AppModal from './app-modal';
 
 export {
   Gap,
@@ -26,4 +27,5 @@ export {
   CardCountry,
   ThumbnailItem,
   Checkbox,
+  AppModal,
 };

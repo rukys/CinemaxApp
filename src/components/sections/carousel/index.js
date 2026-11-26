@@ -48,7 +48,7 @@ const CarouselSection = ({
         count={dataCarousel.length}
         activeDotStyle={tw.style('rounded-full bg-primaryBlueAccent')}
         dotStyle={tw.style('rounded-full bg-primarySoft')}
-        containerStyle={tw.style('mt-2 gap-1.5')}
+        containerStyle={tw.style('mt-2 gap-1.5 self-center')}
         onPress={onPressPagination}
       />
     </View>
