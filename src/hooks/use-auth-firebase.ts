@@ -9,12 +9,13 @@ import {
   signInWithEmailAndPassword,
   signOut,
   updatePassword,
+  type User,
 } from '@react-native-firebase/auth';
 
 // Errors are rethrown as-is so callers keep access to `error.code`
 // (e.g. 'auth/wrong-password') and can show a meaningful message.
 function createAuthFirebase() {
-  const registerWithEmail = async (email, password) => {
+  const registerWithEmail = async (email: string, password: string) => {
     const userCredential = await createUserWithEmailAndPassword(
       getAuth(),
       email,
@@ -23,7 +24,7 @@ function createAuthFirebase() {
     return userCredential.user;
   };
 
-  const loginWithEmail = async (email, password) => {
+  const loginWithEmail = async (email: string, password: string) => {
     const userCredential = await signInWithEmailAndPassword(
       getAuth(),
       email,
@@ -40,32 +41,32 @@ function createAuthFirebase() {
     return getAuth().currentUser;
   };
 
-  const onAuthStateChanged = callback => {
+  const onAuthStateChanged = (callback: (user: User | null) => void) => {
     return onFirebaseAuthStateChanged(getAuth(), callback);
   };
 
-  const reauthenticate = async password => {
+  const reauthenticate = async (password: string): Promise<User> => {
     const user = getAuth().currentUser;
     if (!user?.email) {
-      const error = new Error('No user is currently signed in.');
-      error.code = 'auth/no-current-user';
-      throw error;
+      throw Object.assign(new Error('No user is currently signed in.'), {
+        code: 'auth/no-current-user',
+      });
     }
     const credential = EmailAuthProvider.credential(user.email, password);
     await reauthenticateWithCredential(user, credential);
     return user;
   };
 
-  const changePassword = async (oldPassword, newPassword) => {
+  const changePassword = async (oldPassword: string, newPassword: string) => {
     const user = await reauthenticate(oldPassword);
     await updatePassword(user, newPassword);
   };
 
-  const sendPasswordReset = async email => {
+  const sendPasswordReset = async (email: string) => {
     await sendPasswordResetEmail(getAuth(), email);
   };
 
-  const deleteAccount = async user => {
+  const deleteAccount = async (user: User) => {
     await deleteUser(user);
   };
 

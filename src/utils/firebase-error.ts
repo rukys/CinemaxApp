@@ -1,4 +1,4 @@
-const AUTH_ERROR_MESSAGES = {
+const AUTH_ERROR_MESSAGES: Record<string, string> = {
   'auth/invalid-email': 'The email address is not valid.',
   'auth/invalid-credential': 'Incorrect email or password.',
   'auth/wrong-password': 'Incorrect password.',
@@ -18,13 +18,20 @@ const AUTH_ERROR_MESSAGES = {
 
 const DEFAULT_ERROR_MESSAGE = 'Something went wrong. Please try again.';
 
-export const getAuthErrorMessage = error => {
-  const code = typeof error === 'string' ? error : error?.code;
-  return AUTH_ERROR_MESSAGES[code] || DEFAULT_ERROR_MESSAGE;
+/** Firebase errors carry a string `code`, e.g. "auth/wrong-password". */
+export const getErrorCode = (error: unknown): string | undefined =>
+  typeof error === 'object' && error !== null && 'code' in error
+    ? String((error as { code: unknown }).code)
+    : undefined;
+
+export const getAuthErrorMessage = (error: unknown) => {
+  const code = typeof error === 'string' ? error : getErrorCode(error);
+  return (code && AUTH_ERROR_MESSAGES[code]) || DEFAULT_ERROR_MESSAGE;
 };
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const MIN_PASSWORD_LENGTH = 6;
 
-export const isValidEmail = email => EMAIL_PATTERN.test(String(email).trim());
+export const isValidEmail = (email: string) =>
+  EMAIL_PATTERN.test(String(email).trim());

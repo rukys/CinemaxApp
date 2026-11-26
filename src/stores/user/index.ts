@@ -1,8 +1,15 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import type { UserProfile } from '../../types/user';
 
-const userStore = create(
+interface UserState {
+  /** Empty object when signed out. */
+  user: Partial<UserProfile>;
+  setUser: (user: Partial<UserProfile>) => void;
+}
+
+const userStore = create<UserState>()(
   persist(
     set => ({
       user: {},
