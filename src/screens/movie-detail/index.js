@@ -1,5 +1,4 @@
 /* eslint-disable react-native/no-inline-styles */
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback, useState, useMemo } from 'react';
 import {
   View,
@@ -10,6 +9,7 @@ import {
   RefreshControl,
   Dimensions,
   Pressable,
+  Share,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import ImageView from 'react-native-image-viewing';
@@ -17,7 +17,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import FastImage from 'react-native-fast-image';
 import tw from '../../../tailwind';
 import { Button, Header } from '../../components/commons';
-import { ImageBackdrop } from '../../constants';
+import { ImageBackdrop, ImagePoster } from '../../constants';
+import { safeParseArray } from '../../utils';
 import useMovieGenre from '../../hooks/use-movie-genre';
 import useMovieDetail from '../../hooks/use-movie-detail';
 import useStoreFirebase from '../../hooks/use-store-firebase';
@@ -27,13 +28,8 @@ import {
   ThumbnailSection,
 } from '../../components/sections';
 import ReactNativeModal from 'react-native-modal';
-import { globalStore, userStore } from '../../stores';
-import {
-  Calendar,
-  Heart,
-  SquareArrowOutUpRight,
-  Star,
-} from 'lucide-react-native';
+import { userStore } from '../../stores';
+import { Calendar, Heart, Share2, Star } from 'lucide-react-native';
 import useMovieVideos from '../../hooks/use-movie-videos';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -73,8 +69,7 @@ export default function MovieDetailScreen({ navigation, route }) {
   const [valCastCrew, setValCastCrew] = useState({});
 
   const getUser = userStore(state => state.user);
-  const isLoading = globalStore(state => state.loading);
-  const setIsLoading = globalStore(state => state.setLoading);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     resultMovieDetail,
@@ -88,9 +83,8 @@ export default function MovieDetailScreen({ navigation, route }) {
     onRefetchMovieDetailSimilar,
   } = useMovieDetail(movieData?.id);
 
-  const { videoThumbnails, isLoadingMovieVideos } = useMovieVideos(
-    movieData?.id,
-  );
+  const { videoThumbnails, isLoadingMovieVideos, onRefetchMovieVideos } =
+    useMovieVideos(movieData?.id);
 
   const { saveFavoriteMovie, getFavoriteMovie, deleteFavoriteMovie } =
     useStoreFirebase();
@@ -105,12 +99,7 @@ export default function MovieDetailScreen({ navigation, route }) {
       return movieData.genre_ids;
     }
 
-    try {
-      return JSON.parse(movieData?.genres || '[]');
-    } catch (error) {
-      // console.error('Failed to parse genres:', error);
-      return [];
-    }
+    return safeParseArray(movieData?.genres);
   }, [movieData?.genre_ids, movieData?.genres]);
   const genreNames = useMemo(
     () => getGenreNames(valGenre),
@@ -118,9 +107,13 @@ export default function MovieDetailScreen({ navigation, route }) {
   );
   const genreText = genreNames.join(' | ');
 
-  const rated = Number(resultMovieDetail?.vote_average).toFixed(1) || '0';
+  const voteAverage = Number(resultMovieDetail?.vote_average) || 0;
+  const rated = voteAverage.toFixed(1);
 
-  const urlImageBackdrop = ImageBackdrop(resultMovieDetail?.poster_path) || '';
+  const posterPath = resultMovieDetail?.poster_path;
+  const backdropPath = resultMovieDetail?.backdrop_path || posterPath;
+  const urlImagePoster = posterPath ? ImagePoster(posterPath) : '';
+  const urlImageBackdrop = backdropPath ? ImageBackdrop(backdropPath) : '';
 
   const onSaveFavorite = useCallback(async () => {
     const genreMovie = resultMovieDetail?.genres?.map(item => item.id) || [];
@@ -167,14 +160,34 @@ export default function MovieDetailScreen({ navigation, route }) {
     }
   }, [resultMovieDetail?.id, getUser?.id, getFavoriteMovie]);
 
+  const onShareMovie = useCallback(async () => {
+    const movieId = resultMovieDetail?.id || movieData?.id;
+    if (!movieId) {
+      return;
+    }
+    const title = resultMovieDetail?.title || movieData?.title || '';
+    const url = `https://www.themoviedb.org/movie/${movieId}`;
+    try {
+      await Share.share({
+        title,
+        message: title ? `${title}\n${url}` : url,
+      });
+    } catch (error) {
+      // The user dismissed the share sheet or sharing is unavailable.
+    }
+  }, [resultMovieDetail?.id, resultMovieDetail?.title, movieData]);
+
   const onPressCastCrew = useCallback(item => {
     setValCastCrew(item);
     setVisibleModal(true);
   }, []);
 
-  const onPressThumbnail = useCallback(item => {
-    navigation.navigate('WebViewScreen', { url: item?.videoUrl || '' });
-  }, []);
+  const onPressThumbnail = useCallback(
+    item => {
+      navigation.navigate('WebViewScreen', { url: item?.videoUrl || '' });
+    },
+    [navigation],
+  );
 
   const handleModalClose = useCallback(() => {
     setVisibleModal(false);
@@ -225,6 +238,7 @@ export default function MovieDetailScreen({ navigation, route }) {
     isLoadingMovieGenre,
     isLoadingMovieDetailCredits,
     isLoadingMovieDetailSimilar,
+    isLoadingMovieVideos,
   ]);
 
   const onRefreshScreen = useCallback(async () => {
@@ -239,6 +253,7 @@ export default function MovieDetailScreen({ navigation, route }) {
         onRefetchMovieGenre(),
         onRefetchMovieDetailCredits(),
         onRefetchMovieDetailSimilar(),
+        onRefetchMovieVideos(),
       ]);
     } finally {
       setIsLoading(false);
@@ -248,21 +263,20 @@ export default function MovieDetailScreen({ navigation, route }) {
     onRefetchMovieGenre,
     onRefetchMovieDetailCredits,
     onRefetchMovieDetailSimilar,
+    onRefetchMovieVideos,
   ]);
 
   useFocusEffect(
     useCallback(() => {
-      if (resultMovieDetail?.id || getUser?.id) {
-        onUpdateFavorite();
-      }
-    }, [resultMovieDetail?.id, getUser?.id]),
+      onUpdateFavorite();
+    }, [onUpdateFavorite]),
   );
 
   return (
     <>
       <View style={tw.style('flex-1 bg-primaryDark')}>
         <ImageBackground
-          source={{ uri: urlImageBackdrop }}
+          source={urlImageBackdrop ? { uri: urlImageBackdrop } : undefined}
           resizeMode="cover"
           style={{
             position: 'absolute',
@@ -315,13 +329,15 @@ export default function MovieDetailScreen({ navigation, route }) {
           />
           <View style={tw.style('items-center mb-8')}>
             <Pressable
-              onPress={() => setVisiblePoster(true)}
-              style={tw.style('h-90 w-65% rounded-xl mb-6')}>
-              <FastImage
-                source={{ uri: urlImageBackdrop }}
-                resizeMode="cover"
-                style={tw.style('h-full w-full rounded-xl')}
-              />
+              onPress={() => urlImagePoster && setVisiblePoster(true)}
+              style={tw.style('h-90 w-65% rounded-xl mb-6 bg-primarySoft')}>
+              {!!urlImagePoster && (
+                <FastImage
+                  source={{ uri: urlImagePoster }}
+                  resizeMode="cover"
+                  style={tw.style('h-full w-full rounded-xl')}
+                />
+              )}
             </Pressable>
             <View style={tw.style('flex-row items-center mb-2')}>
               <Calendar
@@ -341,7 +357,7 @@ export default function MovieDetailScreen({ navigation, route }) {
             </Text>
           </View>
           <View style={tw.style('flex-row justify-center mb-6')}>
-            {rated !== 0 && (
+            {voteAverage > 0 && (
               <TouchableOpacity
                 style={tw.style(
                   'flex-row items-center bg-primarySoft px-4 rounded-full mr-2',
@@ -385,10 +401,11 @@ export default function MovieDetailScreen({ navigation, route }) {
               )}
             </TouchableOpacity>
             <TouchableOpacity
+              onPress={onShareMovie}
               style={tw.style(
                 'h-14 bg-primarySoft justify-center p-4 rounded-full ml-2',
               )}>
-              <SquareArrowOutUpRight color={tw.color('white')} size={25} />
+              <Share2 color={tw.color('white')} size={25} />
             </TouchableOpacity>
           </View>
           <View style={tw.style('px-4 bg-primaryDark')}>
@@ -458,7 +475,7 @@ export default function MovieDetailScreen({ navigation, route }) {
       </View>
 
       <ImageView
-        images={[{ uri: urlImageBackdrop }]}
+        images={[{ uri: urlImagePoster }]}
         imageIndex={0}
         visible={visiblePoster}
         onRequestClose={() => setVisiblePoster(false)}
