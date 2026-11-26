@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Dimensions, View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
-import Carousel, { Pagination } from 'react-native-reanimated-carousel';
+import { Carousel, Pagination } from 'react-native-reanimated-carousel';
 import tw from '../../../../tailwind';
 import { Carouselitem } from '../../commons';
 
@@ -16,30 +16,23 @@ const CarouselSection = ({
   const progress = useSharedValue(0);
 
   const onPressPagination = index => {
-    refCarousel.current?.scrollTo({
-      count: index - progress.value,
-      animated: true,
-    });
+    refCarousel.current?.scrollTo({ index, animated: true });
   };
+
   return (
     <View style={tw.style('flex-1', styles)}>
       <Carousel
-        loop={true}
-        autoPlay={true}
-        mode="parallax"
         ref={refCarousel}
-        autoPlayInterval={2500}
-        width={width}
-        height={width / 2}
+        loop
+        autoplay
+        autoplayInterval={2500}
+        style={{ width, height: width / 2 }}
         data={dataCarousel}
-        onProgressChange={progress}
-        modeConfig={{
-          parallaxScrollingScale: 0.9,
-          parallaxScrollingOffset: 50,
-        }}
-        renderItem={({ item, index }) => (
+        progress={progress}
+        layout={{ type: 'parallax', scale: 0.9, offset: 50 }}
+        keyExtractor={(item, index) => String(item?.id ?? index)}
+        renderItem={({ item }) => (
           <Carouselitem
-            key={index.toString()}
             image={item?.backdrop_path}
             title={item?.title}
             releaseDate={item?.release_date}
@@ -50,9 +43,9 @@ const CarouselSection = ({
         )}
       />
 
-      <Pagination.Basic
+      <Pagination
         progress={progress}
-        data={dataCarousel}
+        count={dataCarousel.length}
         activeDotStyle={tw.style('rounded-full bg-primaryBlueAccent')}
         dotStyle={tw.style('rounded-full bg-primarySoft')}
         containerStyle={tw.style('mt-2 gap-1.5')}
