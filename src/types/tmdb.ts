@@ -44,8 +44,7 @@ export interface ProductionCompany {
 }
 
 /** Full movie returned by movie/{id}. */
-export interface MovieDetail
-  extends Omit<Movie, 'genre_ids'> {
+export interface MovieDetail extends Omit<Movie, 'genre_ids'> {
   belongs_to_collection: unknown | null;
   budget: number;
   genres: Genre[];

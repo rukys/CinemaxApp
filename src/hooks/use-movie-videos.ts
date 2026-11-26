@@ -12,7 +12,8 @@ const toThumbnail = (video: Video): VideoThumbnail => ({
   videoKey: video.key,
 });
 
-const isYouTube = (video: Video) => Boolean(video?.key) && video?.site === 'YouTube';
+const isYouTube = (video: Video) =>
+  Boolean(video?.key) && video?.site === 'YouTube';
 
 // Official YouTube trailers/teasers. Falls back to the first YouTube video
 // when there is no official trailer or teaser.

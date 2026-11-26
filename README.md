@@ -6,18 +6,31 @@ Cinemagz App is a movie search and discovery app that makes it easy for you to f
 
 ## Tech Stack
 
-- React Native 0.79.0
-- React Native Asyncstorage
-- React Native Fast Image
-- React Native SVG
-- React Navigation
-- React Query
-- React Hook Form
-- React Animated
-- Zustand
-- Tailwind
+- React Native 0.88.1 (New Architecture, Hermes), React 19.3
+- TypeScript 6 (`strict`)
+- Android target SDK 36, compile SDK 37 (edge-to-edge)
+- React Navigation 7 (stack + bottom tabs)
+- TanStack Query 5 (server state, TMDB API)
+- Zustand 5 (client state, persisted with AsyncStorage 3)
+- Firebase 27 (Auth + Firestore, modular API)
+- Reanimated 4 + react-native-reanimated-carousel 5
+- twrnc (Tailwind for React Native)
 - Axios
-- Firebase
+- @d11/react-native-fast-image, react-native-svg, lucide-react-native
+
+Only Android is maintained. The `ios/` folder still uses the React Native 0.79 template and needs to be migrated before an iOS release.
+
+## Environment
+
+Copy `.env.example` to `.env` and fill in your TMDB "API Read Access Token". The file is read at build time by `react-native-config`, so rebuild the app after changing it.
+
+## Scripts
+
+```bash
+yarn lint        # ESLint
+yarn typecheck   # TypeScript (tsc --noEmit)
+yarn test        # Jest
+```
 
 ## Installation
 
@@ -27,7 +40,7 @@ First, install the project dependencies by running:
 # using npm
 npm install
 
-# OR using Yarn
+# OR using Yarn (recommended, yarn.lock is committed)
 yarn install
 ```
 
