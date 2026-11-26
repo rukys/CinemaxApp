@@ -1,22 +1,26 @@
 buildscript {
     ext {
-        buildToolsVersion = "35.0.0"
+        buildToolsVersion = "37.0.0"
         minSdkVersion = 24
-        compileSdkVersion = 35
-        targetSdkVersion = 35
+        compileSdkVersion = 37
+        targetSdkVersion = 36
         ndkVersion = "27.1.12297006"
-        kotlinVersion = "2.0.21"
+        // 2.4.0 instead of the RN 0.88 template default (2.2.0): Firebase Android
+        // SDK (firebase-auth 25) ships Kotlin 2.4 metadata, see @react-native-firebase/app.
+        kotlinVersion = "2.4.0"
+        // async-storage v3 uses KSP; its built-in Kotlin->KSP table stops at 2.2.x.
+        // KSP 2.3+ is no longer tied to a Kotlin version.
+        kspVersion = "2.3.14"
     }
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath("com.google.gms:google-services:4.4.2")
+        classpath("com.google.gms:google-services:4.6.0")
         classpath("com.android.tools.build:gradle")
         classpath("com.facebook.react:react-native-gradle-plugin")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
-        
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
     }
 }
 
