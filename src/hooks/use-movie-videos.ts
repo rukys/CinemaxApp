@@ -1,76 +1,54 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getMovieDetailVideos } from '../services/root-api';
+import type { Video, VideoThumbnail } from '../types/tmdb';
+import { MOVIE_QUERY_OPTIONS, movieKeys } from './query-keys';
 
-export default function useMovieVideos(params = '') {
-  const queryMovieVideos = useQuery({
-    queryKey: ['get-movie-videos', { movie_id: params }],
-    queryFn: getMovieDetailVideos,
-      enabled: !!params, // hanya fetch kalau params ada
-      staleTime: 5 * 60 * 1000, // 5 menit
-      gcTime: 30 * 60 * 1000, // 30 menit
+const toThumbnail = (video: Video): VideoThumbnail => ({
+  name: video.name,
+  type: video.type,
+  thumbnailUrl: `https://img.youtube.com/vi/${video.key}/sddefault.jpg`,
+  videoUrl: `https://www.youtube.com/watch?v=${video.key}`,
+  videoKey: video.key,
+});
+
+const isYouTube = (video: Video) => Boolean(video?.key) && video?.site === 'YouTube';
+
+// Official YouTube trailers/teasers. Falls back to the first YouTube video
+// when there is no official trailer or teaser.
+export const selectVideoThumbnails = (videos: Video[]): VideoThumbnail[] => {
+  const trailers = videos.filter(
+    video =>
+      isYouTube(video) &&
+      (video.type === 'Trailer' || video.type === 'Teaser') &&
+      video.official === true,
+  );
+  if (trailers.length > 0) {
+    return trailers.map(toThumbnail);
+  }
+  const fallback = videos.find(isYouTube);
+  return fallback ? [toThumbnail(fallback)] : [];
+};
+
+export default function useMovieVideos(movieId?: number) {
+  const id = movieId ?? 0;
+  const query = useQuery({
+    queryKey: movieKeys.videos(id),
+    queryFn: () => getMovieDetailVideos(id),
+    enabled: Boolean(movieId),
+    ...MOVIE_QUERY_OPTIONS,
   });
 
-  const resultMovieVideos = queryMovieVideos?.data?.results || [];
-  const isLoadingMovieVideos = queryMovieVideos.isLoading;
-  const isErrorMovieVideos = queryMovieVideos.isError;
-
-  // Helper function untuk filter & map videos
-  const getVideoThumbnails = () => {
-    // Validasi array kosong
-    if (!resultMovieVideos || resultMovieVideos.length === 0) {
-      return [];
-    }
-
-    const filtered = resultMovieVideos
-      .filter(
-        video =>
-          video?.key && // validasi key ada (penting!)
-          video?.site === 'YouTube' && // pastikan YouTube
-          (video.type === 'Trailer' || video.type === 'Teaser') &&
-          video.official === true,
-      )
-      .map(video => ({
-        name: video.name,
-        type: video.type,
-        thumbnailUrl: `https://img.youtube.com/vi/${video.key}/sddefault.jpg`,
-        videoUrl: `https://www.youtube.com/watch?v=${video.key}`,
-        videoKey: video.key,
-      }));
-
-    // Fallback: kalau ga ada trailer/teaser, ambil video pertama yang valid
-    if (filtered.length === 0) {
-      const fallbackVideo = resultMovieVideos.find(
-        v => v?.key && v?.site === 'YouTube',
-      );
-
-      if (fallbackVideo) {
-        return [
-          {
-            name: fallbackVideo.name,
-            type: fallbackVideo.type,
-            thumbnailUrl: `https://img.youtube.com/vi/${fallbackVideo.key}/sddefault.jpg`,
-            videoUrl: `https://www.youtube.com/watch?v=${fallbackVideo.key}`,
-            videoKey: fallbackVideo.key,
-          },
-        ];
-      }
-    }
-
-    return filtered;
-  };
-
-  const videoThumbnails = getVideoThumbnails();
-
-  const onRefetchMovieVideos = () => {
-    return queryMovieVideos.refetch();
-  };
+  const videoThumbnails = useMemo(
+    () => selectVideoThumbnails(query.data?.results ?? []),
+    [query.data],
+  );
 
   return {
-    resultMovieVideos,
-    isLoadingMovieVideos,
-    isErrorMovieVideos,
     videoThumbnails,
     hasVideos: videoThumbnails.length > 0,
-    onRefetchMovieVideos,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    refetch: query.refetch,
   };
 }

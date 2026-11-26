@@ -71,28 +71,28 @@ export default function MovieDetailScreen({ navigation, route }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const {
-    resultMovieDetail,
-    resultMovieDetailCredits,
-    resultMovieDetailSimilar,
-    isLoadingMovieDetail,
-    isLoadingMovieDetailCredits,
-    isLoadingMovieDetailSimilar,
-    onRefetchMovieDetail,
-    onRefetchMovieDetailCredits,
-    onRefetchMovieDetailSimilar,
+    detail: resultMovieDetail,
+    cast: valCastArray,
+    crew: valCrewArray,
+    similar: resultMovieDetailSimilar,
+    isLoading: isLoadingMovieDetail,
+    refetch: onRefetchMovieDetail,
   } = useMovieDetail(movieData?.id);
 
-  const { videoThumbnails, isLoadingMovieVideos, onRefetchMovieVideos } =
-    useMovieVideos(movieData?.id);
+  const {
+    videoThumbnails,
+    isLoading: isLoadingMovieVideos,
+    refetch: onRefetchMovieVideos,
+  } = useMovieVideos(movieData?.id);
 
   const { saveFavoriteMovie, getFavoriteMovie, deleteFavoriteMovie } =
     useStoreFirebase();
 
-  const valCastArray = resultMovieDetailCredits?.cast || [];
-  const valCrewArray = resultMovieDetailCredits?.crew || [];
-
-  const { getGenreNames, isLoadingMovieGenre, onRefetchMovieGenre } =
-    useMovieGenre();
+  const {
+    getGenreNames,
+    isLoading: isLoadingMovieGenre,
+    refetch: onRefetchMovieGenre,
+  } = useMovieGenre();
   const valGenre = useMemo(() => {
     if (movieData?.genre_ids) {
       return movieData.genre_ids;
@@ -227,16 +227,12 @@ export default function MovieDetailScreen({ navigation, route }) {
       isLoading ||
       isLoadingMovieDetail ||
       isLoadingMovieGenre ||
-      isLoadingMovieDetailCredits ||
-      isLoadingMovieDetailSimilar ||
       isLoadingMovieVideos
     );
   }, [
     isLoading,
     isLoadingMovieDetail,
     isLoadingMovieGenre,
-    isLoadingMovieDetailCredits,
-    isLoadingMovieDetailSimilar,
     isLoadingMovieVideos,
   ]);
 
@@ -250,8 +246,6 @@ export default function MovieDetailScreen({ navigation, route }) {
         minDelay,
         onRefetchMovieDetail(),
         onRefetchMovieGenre(),
-        onRefetchMovieDetailCredits(),
-        onRefetchMovieDetailSimilar(),
         onRefetchMovieVideos(),
       ]);
     } finally {
@@ -260,8 +254,6 @@ export default function MovieDetailScreen({ navigation, route }) {
   }, [
     onRefetchMovieDetail,
     onRefetchMovieGenre,
-    onRefetchMovieDetailCredits,
-    onRefetchMovieDetailSimilar,
     onRefetchMovieVideos,
   ]);
 

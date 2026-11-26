@@ -1,16 +1,18 @@
+import type { Movie } from '../types/tmdb';
+
 // Parses a JSON array string (e.g. genres stored in Firestore). Returns an
 // empty array for missing or malformed values instead of throwing.
-export const safeParseArray = value => {
+export const safeParseArray = <T = number>(value: unknown): T[] => {
   if (Array.isArray(value)) {
-    return value;
+    return value as T[];
   }
   if (typeof value !== 'string' || value === '') {
     return [];
   }
   try {
-    const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (error) {
+    const parsed: unknown = JSON.parse(value);
+    return Array.isArray(parsed) ? (parsed as T[]) : [];
+  } catch {
     return [];
   }
 };
@@ -18,9 +20,15 @@ export const safeParseArray = value => {
 // Returns today's date as YYYY-MM-DD in the device's local timezone.
 // `toISOString()` uses UTC, which is still "yesterday" for early-morning
 // users east of UTC (e.g. WIB, UTC+7).
-export const getLocalDateString = (date = new Date()) => {
+export const getLocalDateString = (date: Date = new Date()) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+};
+
+/** Movies whose release date is today (local time). */
+export const filterReleasedToday = (movies: Movie[]) => {
+  const today = getLocalDateString();
+  return movies.filter(movie => movie.release_date === today);
 };

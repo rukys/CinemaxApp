@@ -3,9 +3,9 @@ import { FlatList, Text, View } from 'react-native';
 import tw from '../../../tailwind';
 import { CardList } from '../../components/commons';
 import { HomeSection, SearchSection } from '../../components/sections';
-import useMovieToprated from '../../hooks/use-movie-toprated';
-import useMovieNowplaying from '../../hooks/use-movie-nowplaying';
+import useMovieList from '../../hooks/use-movie-list';
 import useMovieGenre from '../../hooks/use-movie-genre';
+import { filterReleasedToday } from '../../utils';
 import useMovieSearch from '../../hooks/use-movie-search';
 import { ImgNoResult } from '../../assets';
 import { userStore } from '../../stores';
@@ -24,9 +24,12 @@ export default function SearchScreen({ navigation }) {
   const keyword = trimmedSearch === '' ? '' : debouncedSearch;
   const isTyping = keyword !== trimmedSearch;
 
-  const { resultMovieSearch, isLoadingMovieSearch } = useMovieSearch(keyword);
-  const { resultMovieToprated } = useMovieToprated(getUser?.countryCode);
-  const { moviesToday } = useMovieNowplaying(getUser?.countryCode);
+  const countryCode = getUser?.countryCode ?? '';
+  const { movies: resultMovieSearch, isLoading: isLoadingMovieSearch } =
+    useMovieSearch(keyword);
+  const { movies: resultMovieToprated } = useMovieList('top_rated', countryCode);
+  const { movies: nowPlaying } = useMovieList('now_playing', countryCode);
+  const moviesToday = useMemo(() => filterReleasedToday(nowPlaying), [nowPlaying]);
   const { getGenreNames } = useMovieGenre();
 
   const handleSearchChange = useCallback(val => {

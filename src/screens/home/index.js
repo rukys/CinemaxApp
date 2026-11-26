@@ -8,11 +8,9 @@ import {
   HomeSection,
   SearchSection,
 } from '../../components/sections';
-import useMovieUpcoming from '../../hooks/use-movie-upcoming';
 import { userStore } from '../../stores';
 import useMovieGenre from '../../hooks/use-movie-genre';
-import useMoviePopular from '../../hooks/use-movie-popular';
-import useMovieNowplaying from '../../hooks/use-movie-nowplaying';
+import useMovieList from '../../hooks/use-movie-list';
 
 export default function HomeScreen({ navigation }) {
   const [category, setCategory] = useState('All');
@@ -20,20 +18,16 @@ export default function HomeScreen({ navigation }) {
   const getUser = userStore(state => state.user);
   const [isLoading, setIsLoading] = useState(false);
 
-  const {
-    resultMovieUpcoming,
-    isLoadingMovieUpcoming,
-    onRefetchMovieUpcoming,
-  } = useMovieUpcoming(getUser?.countryCode);
-  const {
-    resultMovieNowplaying,
-    isLoadingMovieNowplaying,
-    onRefetchMovieNowplaying,
-  } = useMovieNowplaying(getUser?.countryCode);
-  const { resultMovieGenre, isLoadingMovieGenre, onRefetchMovieGenre } =
-    useMovieGenre();
-  const { resultMoviePopular, isLoadingMoviePopular, onRefetchMoviePopular } =
-    useMoviePopular(getUser?.countryCode);
+  const countryCode = getUser?.countryCode ?? '';
+  const upcoming = useMovieList('upcoming', countryCode);
+  const nowPlaying = useMovieList('now_playing', countryCode);
+  const popular = useMovieList('popular', countryCode);
+  const genre = useMovieGenre();
+
+  const resultMovieUpcoming = upcoming.movies;
+  const resultMovieNowplaying = nowPlaying.movies;
+  const resultMoviePopular = popular.movies;
+  const resultMovieGenre = genre.genres;
 
   const selectedGenreId = useMemo(() => {
     return category === 'All'
@@ -60,17 +54,17 @@ export default function HomeScreen({ navigation }) {
   const isAnyLoading = useMemo(() => {
     return (
       isLoading ||
-      isLoadingMovieUpcoming ||
-      isLoadingMovieNowplaying ||
-      isLoadingMovieGenre ||
-      isLoadingMoviePopular
+      upcoming.isLoading ||
+      nowPlaying.isLoading ||
+      genre.isLoading ||
+      popular.isLoading
     );
   }, [
     isLoading,
-    isLoadingMovieUpcoming,
-    isLoadingMovieNowplaying,
-    isLoadingMovieGenre,
-    isLoadingMoviePopular,
+    upcoming.isLoading,
+    nowPlaying.isLoading,
+    genre.isLoading,
+    popular.isLoading,
   ]);
 
   const handleMoviePress = useCallback(
@@ -88,20 +82,15 @@ export default function HomeScreen({ navigation }) {
     try {
       await Promise.all([
         minDelay,
-        onRefetchMovieUpcoming(),
-        onRefetchMovieNowplaying(),
-        onRefetchMovieGenre(),
-        onRefetchMoviePopular(),
+        upcoming.refetch(),
+        nowPlaying.refetch(),
+        genre.refetch(),
+        popular.refetch(),
       ]);
     } finally {
       setIsLoading(false);
     }
-  }, [
-    onRefetchMovieUpcoming,
-    onRefetchMovieNowplaying,
-    onRefetchMovieGenre,
-    onRefetchMoviePopular,
-  ]);
+  }, [upcoming, nowPlaying, genre, popular]);
 
   return (
     <View style={tw.style('flex-1 bg-primaryDark')}>
