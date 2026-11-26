@@ -22,7 +22,7 @@ import { ImgProfile, ImgQuestion } from '../../assets';
 import { userStore } from '../../stores';
 import { ProfileSection } from '../../components/sections';
 import useAuthFirebase from '../../hooks/use-auth-firebase';
-import FastImage from 'react-native-fast-image';
+import FastImage from '@d11/react-native-fast-image';
 import useStoreFirebase from '../../hooks/use-store-firebase';
 import { getAuthErrorMessage } from '../../utils/firebase-error';
 
@@ -45,7 +45,7 @@ export default function ProfileScreen({ navigation }) {
     [getUser?.fullName, getUser?.email],
   );
 
-  const { logout, reauthenticate } = useAuthFirebase();
+  const { logout, reauthenticate, deleteAccount } = useAuthFirebase();
   const { deleteUserFireStore, deleteAllFavoriteMovie } = useStoreFirebase();
 
   const onClearCacheApp = useCallback(() => {
@@ -102,7 +102,7 @@ export default function ProfileScreen({ navigation }) {
     try {
       await deleteAllFavoriteMovie(user.uid);
       await deleteUserFireStore(user.uid);
-      await user.delete();
+      await deleteAccount(user);
     } catch (error) {
       setDeleteError(
         error?.code
@@ -119,6 +119,7 @@ export default function ProfileScreen({ navigation }) {
     onClearCacheApp();
   }, [
     deletePassword,
+    deleteAccount,
     reauthenticate,
     deleteAllFavoriteMovie,
     deleteUserFireStore,

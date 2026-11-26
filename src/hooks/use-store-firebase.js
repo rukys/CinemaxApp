@@ -1,11 +1,28 @@
-import firestore from '@react-native-firebase/firestore';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  onSnapshot,
+  setDoc,
+  updateDoc,
+  writeBatch,
+} from '@react-native-firebase/firestore';
+
+const userDoc = uid => doc(getFirestore(), 'users', uid);
+const favoriteCollection = uid =>
+  collection(getFirestore(), 'users', uid, 'favorite');
+const favoriteDoc = (uid, id) =>
+  doc(getFirestore(), 'users', uid, 'favorite', String(id));
 
 function createStoreFirebase() {
   // -- user --//
   const saveUserToFirestore = async userData => {
     try {
-      const userRef = firestore().collection('users').doc(userData.id);
-      await userRef.set(userData, { merge: true }); // merge: true to prevent overwriting
+      // merge: true to prevent overwriting
+      await setDoc(userDoc(userData.id), userData, { merge: true });
     } catch (error) {
       throw new Error('Failed to save user data: ' + error.message);
     }
@@ -13,9 +30,9 @@ function createStoreFirebase() {
 
   const getUserFromFirestore = async uid => {
     try {
-      const userDoc = await firestore().collection('users').doc(uid).get();
-      if (userDoc.exists) {
-        return userDoc.data();
+      const snapshot = await getDoc(userDoc(uid));
+      if (snapshot.exists()) {
+        return snapshot.data();
       } else {
         throw new Error('User not found');
       }
@@ -26,8 +43,7 @@ function createStoreFirebase() {
 
   const updateUserToFirestore = async userData => {
     try {
-      const userRef = firestore().collection('users').doc(userData.id);
-      await userRef.update(userData);
+      await updateDoc(userDoc(userData.id), userData);
     } catch (error) {
       throw new Error('Failed to update user data: ' + error.message);
     }
@@ -35,9 +51,8 @@ function createStoreFirebase() {
 
   const updateUserCountryCode = async (uid, countryCode) => {
     try {
-      const userRef = firestore().collection('users').doc(uid);
       // merge: true also works when the profile document does not exist yet.
-      await userRef.set({ countryCode }, { merge: true });
+      await setDoc(userDoc(uid), { countryCode }, { merge: true });
     } catch (error) {
       throw new Error('Failed to update country code: ' + error.message);
     }
@@ -47,36 +62,27 @@ function createStoreFirebase() {
   // profile document was never created can still delete their account.
   const deleteUserFireStore = async uid => {
     try {
-      await firestore().collection('users').doc(uid).delete();
+      await deleteDoc(userDoc(uid));
     } catch (error) {
       throw new Error('Failed to delete user data: ' + error.message);
     }
   };
 
   const listenToUserData = (uid, callback) => {
-    return firestore()
-      .collection('users')
-      .doc(uid)
-      .onSnapshot(doc => {
-        if (doc.exists) {
-          callback(doc.data());
-        } else {
-          callback(null);
-        }
-      });
+    return onSnapshot(userDoc(uid), snapshot => {
+      if (snapshot.exists()) {
+        callback(snapshot.data());
+      } else {
+        callback(null);
+      }
+    });
   };
   // -- -- //
 
   // -- favorite movie --//
   const saveFavoriteMovie = async (movieData, uid) => {
     try {
-      const favMovieRef = firestore()
-        .collection('users')
-        .doc(uid)
-        .collection('favorite')
-        .doc(movieData.id);
-
-      await favMovieRef.set(movieData, { merge: true });
+      await setDoc(favoriteDoc(uid, movieData.id), movieData, { merge: true });
     } catch (error) {
       throw new Error('Failed to save favorite movie data: ' + error.message);
     }
@@ -84,22 +90,16 @@ function createStoreFirebase() {
 
   const getListFavoriteMovie = async uid => {
     try {
-      const snapshot = await firestore()
-        .collection('users')
-        .doc(uid)
-        .collection('favorite')
-        .get();
+      const snapshot = await getDocs(favoriteCollection(uid));
 
       if (snapshot.empty) {
         return [];
       }
 
-      const favoriteMovies = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
+      return snapshot.docs.map(item => ({
+        id: item.id,
+        ...item.data(),
       }));
-
-      return favoriteMovies;
     } catch (error) {
       throw new Error(
         'Failed to get favorite list movie data: ' + error.message,
@@ -109,14 +109,9 @@ function createStoreFirebase() {
 
   const getFavoriteMovie = async (id, uid) => {
     try {
-      const favMovieRef = await firestore()
-        .collection('users')
-        .doc(uid)
-        .collection('favorite')
-        .doc(id)
-        .get();
-      if (favMovieRef.exists) {
-        return favMovieRef.data();
+      const snapshot = await getDoc(favoriteDoc(uid, id));
+      if (snapshot.exists()) {
+        return snapshot.data();
       } else {
         throw new Error('Favorite movie not found');
       }
@@ -127,19 +122,14 @@ function createStoreFirebase() {
 
   const deleteFavoriteMovie = async (id, uid) => {
     try {
-      const docRef = firestore()
-        .collection('users')
-        .doc(uid)
-        .collection('favorite')
-        .doc(id);
+      const docRef = favoriteDoc(uid, id);
+      const snapshot = await getDoc(docRef);
 
-      const snapshot = await docRef.get();
-
-      if (!snapshot.exists) {
+      if (!snapshot.exists()) {
         throw new Error('Favorite movie not found');
       }
 
-      await docRef.delete();
+      await deleteDoc(docRef);
       return snapshot.data();
     } catch (error) {
       throw new Error('Failed to delete favorite movie data: ' + error.message);
@@ -148,13 +138,12 @@ function createStoreFirebase() {
 
   const deleteAllFavoriteMovie = async uid => {
     try {
-      const docRef = firestore().collection('users').doc(uid);
       // Hapus subcollection favorite
-      const favoriteSnapshot = await docRef.collection('favorite').get();
-      const batch = firestore().batch();
+      const favoriteSnapshot = await getDocs(favoriteCollection(uid));
+      const batch = writeBatch(getFirestore());
 
-      favoriteSnapshot.forEach(doc => {
-        batch.delete(doc.ref);
+      favoriteSnapshot.forEach(item => {
+        batch.delete(item.ref);
       });
 
       await batch.commit();

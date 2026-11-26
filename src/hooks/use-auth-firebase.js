@@ -1,10 +1,22 @@
-import auth from '@react-native-firebase/auth';
+import {
+  createUserWithEmailAndPassword,
+  deleteUser,
+  EmailAuthProvider,
+  getAuth,
+  onAuthStateChanged as onFirebaseAuthStateChanged,
+  reauthenticateWithCredential,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut,
+  updatePassword,
+} from '@react-native-firebase/auth';
 
 // Errors are rethrown as-is so callers keep access to `error.code`
 // (e.g. 'auth/wrong-password') and can show a meaningful message.
 function createAuthFirebase() {
   const registerWithEmail = async (email, password) => {
-    const userCredential = await auth().createUserWithEmailAndPassword(
+    const userCredential = await createUserWithEmailAndPassword(
+      getAuth(),
       email,
       password,
     );
@@ -12,7 +24,8 @@ function createAuthFirebase() {
   };
 
   const loginWithEmail = async (email, password) => {
-    const userCredential = await auth().signInWithEmailAndPassword(
+    const userCredential = await signInWithEmailAndPassword(
+      getAuth(),
       email,
       password,
     );
@@ -20,36 +33,40 @@ function createAuthFirebase() {
   };
 
   const logout = async () => {
-    await auth().signOut();
+    await signOut(getAuth());
   };
 
   const getCurrentUser = () => {
-    return auth().currentUser;
+    return getAuth().currentUser;
   };
 
   const onAuthStateChanged = callback => {
-    return auth().onAuthStateChanged(callback);
+    return onFirebaseAuthStateChanged(getAuth(), callback);
   };
 
   const reauthenticate = async password => {
-    const user = auth().currentUser;
+    const user = getAuth().currentUser;
     if (!user?.email) {
       const error = new Error('No user is currently signed in.');
       error.code = 'auth/no-current-user';
       throw error;
     }
-    const credential = auth.EmailAuthProvider.credential(user.email, password);
-    await user.reauthenticateWithCredential(credential);
+    const credential = EmailAuthProvider.credential(user.email, password);
+    await reauthenticateWithCredential(user, credential);
     return user;
   };
 
   const changePassword = async (oldPassword, newPassword) => {
     const user = await reauthenticate(oldPassword);
-    await user.updatePassword(newPassword);
+    await updatePassword(user, newPassword);
   };
 
   const sendPasswordReset = async email => {
-    await auth().sendPasswordResetEmail(email);
+    await sendPasswordResetEmail(getAuth(), email);
+  };
+
+  const deleteAccount = async user => {
+    await deleteUser(user);
   };
 
   return {
@@ -61,6 +78,7 @@ function createAuthFirebase() {
     reauthenticate,
     changePassword,
     sendPasswordReset,
+    deleteAccount,
   };
 }
 
