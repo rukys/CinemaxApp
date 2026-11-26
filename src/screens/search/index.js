@@ -9,14 +9,22 @@ import useMovieGenre from '../../hooks/use-movie-genre';
 import useMovieSearch from '../../hooks/use-movie-search';
 import { ImgNoResult } from '../../assets';
 import { userStore } from '../../stores';
+import useDebounce from '../../hooks/use-debounce';
+
+const SEARCH_DEBOUNCE_MS = 400;
 
 export default function SearchScreen({ navigation }) {
   const [valueSearch, setValueSearch] = useState('');
 
   const getUser = userStore(state => state.user);
 
-  const { resultMovieSearch, isLoadingMovieSearch } =
-    useMovieSearch(valueSearch);
+  const trimmedSearch = valueSearch.trim();
+  const debouncedSearch = useDebounce(trimmedSearch, SEARCH_DEBOUNCE_MS);
+  // Clearing the input resets results immediately instead of waiting.
+  const keyword = trimmedSearch === '' ? '' : debouncedSearch;
+  const isTyping = keyword !== trimmedSearch;
+
+  const { resultMovieSearch, isLoadingMovieSearch } = useMovieSearch(keyword);
   const { resultMovieToprated } = useMovieToprated(getUser?.countryCode);
   const { moviesToday } = useMovieNowplaying(getUser?.countryCode);
   const { getGenreNames } = useMovieGenre();
@@ -51,7 +59,7 @@ export default function SearchScreen({ navigation }) {
     [navigation],
   );
 
-  const isSearchEmpty = useMemo(() => valueSearch === '', [valueSearch]);
+  const isSearchEmpty = useMemo(() => keyword === '', [keyword]);
   const hasSearchResults = useMemo(
     () => resultMovieSearch.length > 0,
     [resultMovieSearch.length],
@@ -61,8 +69,9 @@ export default function SearchScreen({ navigation }) {
     [moviesToday.length],
   );
   const shouldShowNoResult = useMemo(
-    () => !isSearchEmpty && !hasSearchResults && !isLoadingMovieSearch,
-    [isSearchEmpty, hasSearchResults, isLoadingMovieSearch],
+    () =>
+      !isSearchEmpty && !hasSearchResults && !isLoadingMovieSearch && !isTyping,
+    [isSearchEmpty, hasSearchResults, isLoadingMovieSearch, isTyping],
   );
   const shouldShowTodaySection = useMemo(
     () => isSearchEmpty && !hasSearchResults && hasMoviesToday,

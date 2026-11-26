@@ -1,116 +1,80 @@
 import { fetchApi } from './fetch-api';
 import { API_HOST } from '../config';
 
-// -- function get configuration --
-const apiConfigLanguages = () => `${API_HOST}configuration/languages`;
-export const getConfigLanguages = () => {
-  return fetchApi({
-    url: apiConfigLanguages(),
+const DEFAULT_LANGUAGE = 'en-US';
+
+// Query strings are passed through axios `params` so every value is
+// URL-encoded (e.g. a search keyword containing "&" or "#").
+const get = (path, params = {}) =>
+  fetchApi({
+    url: `${API_HOST}${path}`,
+    params: { language: DEFAULT_LANGUAGE, ...params },
   });
+
+// TMDB rejects an empty `region`, so only send it when it is set.
+const withRegion = (countryCode, params = {}) =>
+  countryCode ? { ...params, region: countryCode } : params;
+
+// -- function get configuration --
+export const getConfigLanguages = () => {
+  return fetchApi({ url: `${API_HOST}configuration/languages` });
 };
 
-const apiConfigCountries = () =>
-  `${API_HOST}configuration/countries?language=en-US`;
 export const getConfigCountries = () => {
-  return fetchApi({
-    url: apiConfigCountries(),
-  });
+  return get('configuration/countries');
 };
 
 // -- function get movie --
-const apiMovieTrending = (countryCode = '') =>
-  `${API_HOST}trending/movie/day?language=en-US&page=1&region=${countryCode}`;
 export const getMovieTrending = ({ queryKey }) => {
   const [, { countryCode }] = queryKey;
-  return fetchApi({
-    url: apiMovieTrending(countryCode),
-  });
+  return get('trending/movie/day', withRegion(countryCode, { page: 1 }));
 };
 
-const apiMovieGenre = () => `${API_HOST}genre/movie/list?language=en-US`;
 export const getMovieGenre = () => {
-  return fetchApi({
-    url: apiMovieGenre(),
-  });
+  return get('genre/movie/list');
 };
 
-const apiMovieNowPlaying = (countryCode = '') =>
-  `${API_HOST}movie/now_playing?language=en-US&page=1&region=${countryCode}`;
 export const getMovieNowPlaying = ({ queryKey }) => {
   const [, { countryCode }] = queryKey;
-  return fetchApi({
-    url: apiMovieNowPlaying(countryCode),
-  });
+  return get('movie/now_playing', withRegion(countryCode, { page: 1 }));
 };
 
-const apiMoviePopular = (countryCode = '') =>
-  `${API_HOST}movie/popular?language=en-US&page=1&region=${countryCode}`;
 export const getMoviePopular = ({ queryKey }) => {
   const [, { countryCode }] = queryKey;
-  return fetchApi({
-    url: apiMoviePopular(countryCode),
-  });
+  return get('movie/popular', withRegion(countryCode, { page: 1 }));
 };
 
-const apiMovieTopRated = (countryCode = '') =>
-  `${API_HOST}movie/top_rated?language=en-US&page=1&region=${countryCode}`;
 export const getMovieTopRated = ({ queryKey }) => {
   const [, { countryCode }] = queryKey;
-  return fetchApi({
-    url: apiMovieTopRated(countryCode),
-  });
+  return get('movie/top_rated', withRegion(countryCode, { page: 1 }));
 };
 
-const apiMovieUpcoming = (countryCode = '') =>
-  `${API_HOST}movie/upcoming?language=en-US&page=1&region=${countryCode}`;
 export const getMovieUpcoming = ({ queryKey }) => {
   const [, { countryCode }] = queryKey;
-  return fetchApi({
-    url: apiMovieUpcoming(countryCode),
-  });
+  return get('movie/upcoming', withRegion(countryCode, { page: 1 }));
 };
 
-const apiMovieSearch = (keyword = '') =>
-  `${API_HOST}search/movie?query=${keyword}&language=en-US&page=1`;
 export const getMovieSearch = ({ queryKey }) => {
   const [, { keyword }] = queryKey;
-  return fetchApi({
-    url: apiMovieSearch(keyword),
-  });
+  return get('search/movie', { query: keyword, page: 1 });
 };
 
-const apiMovieDetail = (movie_id = '') =>
-  `${API_HOST}movie/${movie_id}?language=en-US`;
 export const getMovieDetail = ({ queryKey }) => {
   const [, { movie_id }] = queryKey;
-  return fetchApi({
-    url: apiMovieDetail(movie_id),
-  });
+  return get(`movie/${movie_id}`);
 };
 
-const apiMovieDetailCredits = (movie_id = '') =>
-  `${API_HOST}movie/${movie_id}/credits?language=en-US`;
 export const getMovieDetailCredits = ({ queryKey }) => {
   const [, { movie_id }] = queryKey;
-  return fetchApi({
-    url: apiMovieDetailCredits(movie_id),
-  });
+  return get(`movie/${movie_id}/credits`);
 };
 
-const apiMovieDetailVideos = (movie_id = '') =>
-  `${API_HOST}movie/${movie_id}/videos?language=en-US`;
 export const getMovieDetailVideos = ({ queryKey }) => {
   const [, { movie_id }] = queryKey;
-  return fetchApi({
-    url: apiMovieDetailVideos(movie_id),
-  });
+  return get(`movie/${movie_id}/videos`);
 };
 
-const apiMovieDetailSimilar = (movie_id = '') =>
-  `${API_HOST}movie/${movie_id}/similar?language=en-US`;
 export const getMovieDetailSimilar = ({ queryKey }) => {
   const [, { movie_id }] = queryKey;
-  return fetchApi({
-    url: apiMovieDetailSimilar(movie_id),
-  });
+  return get(`movie/${movie_id}/similar`);
 };
